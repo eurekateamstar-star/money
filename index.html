@@ -10,15 +10,20 @@
   <!-- FontAwesome 圖示庫 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* 鎖定網頁整體根部，防止整個畫面亂飄或左右晃動 */
     html, body {
-      overflow-x: hidden;
+      overflow: hidden;
       width: 100%;
-      position: relative;
+      height: 100%;
+      position: fixed;
+      background-color: #F8FAFC;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
-      background-color: #F8FAFC;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     .ios-blur {
       backdrop-filter: blur(20px);
@@ -37,10 +42,10 @@
     }
   </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col justify-between select-none pb-24">
+<body class="text-slate-800 select-none">
 
   <!-- 頂部精簡導航列 (固定不動) -->
-  <header class="sticky top-0 z-40 bg-white/90 ios-blur border-b border-slate-100 pt-safe shadow-xs w-full">
+  <header class="z-40 bg-white/90 ios-blur border-b border-slate-100 pt-safe shadow-xs w-full shrink-0">
     <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs shadow-md shadow-indigo-500/20 shrink-0">
@@ -54,8 +59,8 @@
     </div>
   </header>
 
-  <!-- 主內容區 -->
-  <main class="max-w-md mx-auto w-full px-4 pt-4 space-y-4 flex-1">
+  <!-- 主內容區：改為內部獨立卷軸滾動，外框不跑版 -->
+  <main class="max-w-md mx-auto w-full px-4 py-4 space-y-4 overflow-y-auto no-scrollbar flex-1 pb-20">
 
     <!-- ==================== 分頁一：管理登記頁面 ==================== -->
     <div id="tabManageContent" class="space-y-4">
@@ -273,7 +278,7 @@
 
 
   <!-- ==================== 底部固定導航列 (Tab Bar) ==================== -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 ios-blur border-t border-slate-100 pb-safe shadow-lg">
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 ios-blur border-t border-slate-100 pb-safe shadow-lg shrink-0">
     <div class="max-w-md mx-auto grid grid-cols-2 py-2 px-6">
       <button onclick="switchTab('manage')" id="navManageBtn" class="flex flex-col items-center gap-1 text-indigo-600 font-black tap-effect">
         <i class="fa-solid fa-cash-register text-lg"></i>
@@ -399,6 +404,7 @@
       const navManageBtn = document.getElementById('navManageBtn');
       const navChartBtn = document.getElementById('navChartBtn');
       const headerTitle = document.getElementById('headerTitle');
+      const mainContainer = document.querySelector('main');
 
       if (tabName === 'manage') {
         manageContent.classList.remove('hidden');
@@ -414,7 +420,7 @@
         headerTitle.innerText = "營收圖表分析";
         renderChart();
       }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.openCalculator = function(fieldId, titleText) {
@@ -729,7 +735,7 @@
       document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-pen"></i> 確認修改儲存';
       document.getElementById('submitBtn').classList.replace('bg-indigo-600', 'bg-emerald-600');
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.cancelEdit = function() {
