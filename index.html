@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
+  <!-- 強制鎖定手機縮放與左右滑動 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>兌幣機管理</title>
   <!-- Tailwind CSS -->
@@ -9,6 +10,11 @@
   <!-- FontAwesome 圖示庫 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      position: relative;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
@@ -33,16 +39,16 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col justify-between select-none pb-24">
 
-  <!-- 頂部精簡導航列 -->
-  <header class="sticky top-0 z-40 bg-white/90 ios-blur border-b border-slate-100 pt-safe shadow-xs">
+  <!-- 頂部精簡導航列 (固定不動) -->
+  <header class="sticky top-0 z-40 bg-white/90 ios-blur border-b border-slate-100 pt-safe shadow-xs w-full">
     <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs shadow-md shadow-indigo-500/20">
+        <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs shadow-md shadow-indigo-500/20 shrink-0">
           <i class="fa-solid fa-gamepad"></i>
         </div>
-        <h1 class="text-base font-black text-slate-900 tracking-tight" id="headerTitle">兌幣機管理系統</h1>
+        <h1 class="text-base font-black text-slate-900 tracking-tight truncate" id="headerTitle">兌幣機管理系統</h1>
       </div>
-      <button onclick="fetchData()" class="w-8 h-8 rounded-full bg-slate-100 text-indigo-600 flex items-center justify-center tap-effect text-xs shadow-xs">
+      <button onclick="fetchData()" class="w-8 h-8 rounded-full bg-slate-100 text-indigo-600 flex items-center justify-center tap-effect text-xs shadow-xs shrink-0">
         <i class="fa-solid fa-arrows-rotate"></i>
       </button>
     </div>
@@ -65,20 +71,20 @@
         </div>
       </div>
 
-      <!-- 儀表板卡片 (高對比鮮明版) -->
+      <!-- 儀表板卡片 -->
       <div class="grid grid-cols-2 gap-3">
         <!-- 剩餘 10 元硬幣 -->
         <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden">
           <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none"></div>
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
+            <div class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs shrink-0">
               <i class="fa-solid fa-coins"></i>
             </div>
-            <span class="text-xs font-bold text-slate-400">剩餘硬幣</span>
+            <span class="text-xs font-bold text-slate-400 truncate">剩餘硬幣</span>
           </div>
           <div class="my-2">
-            <div class="text-2xl font-black text-slate-900 tracking-tight" id="currentCoins">$ 25,000</div>
-            <div class="text-[11px] text-slate-400 font-bold mt-0.5" id="coinCount">約 2,500 枚</div>
+            <div class="text-2xl font-black text-slate-900 tracking-tight truncate" id="currentCoins">$ 25,000</div>
+            <div class="text-[11px] text-slate-400 font-bold mt-0.5 truncate" id="coinCount">約 2,500 枚</div>
           </div>
           <span class="text-[10px] text-blue-600 bg-blue-50/80 py-1 px-2 rounded-lg inline-block self-start font-extrabold">初始 $25,000 (9/4)</span>
         </div>
@@ -87,14 +93,14 @@
         <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden">
           <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none"></div>
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">
+            <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs shrink-0">
               <i class="fa-solid fa-money-bill-wave"></i>
             </div>
-            <span class="text-xs font-bold text-slate-400">歷史總營收</span>
+            <span class="text-xs font-bold text-slate-400 truncate">歷史總營收</span>
           </div>
           <div class="my-2">
-            <div class="text-2xl font-black text-emerald-600 tracking-tight" id="totalCashTaken">$ 0</div>
-            <div class="text-[11px] text-slate-400 font-bold mt-0.5" id="totalCoinsAdded">補幣累計: $0</div>
+            <div class="text-2xl font-black text-emerald-600 tracking-tight truncate" id="totalCashTaken">$ 0</div>
+            <div class="text-[11px] text-slate-400 font-bold mt-0.5 truncate" id="totalCoinsAdded">補幣累計: $0</div>
           </div>
           <span class="text-[10px] text-emerald-700 bg-emerald-50/80 py-1 px-2 rounded-lg inline-block self-start font-extrabold">已取走鈔票</span>
         </div>
@@ -102,34 +108,44 @@
 
       <!-- 柏昇交接給奕昕的欠款狀態卡片 -->
       <div id="debtCard" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-3xl p-4 flex items-center justify-between shadow-md shadow-amber-500/20 hidden">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-white/20 ios-blur flex items-center justify-center text-base font-bold">
+        <div class="flex items-center gap-3 min-w-0 pr-2">
+          <div class="w-10 h-10 rounded-2xl bg-white/20 ios-blur flex items-center justify-center text-base font-bold shrink-0">
             <i class="fa-solid fa-hand-holding-dollar"></i>
           </div>
-          <div>
-            <div class="text-xs font-medium text-amber-100">柏昇未交接現金（待收回）</div>
-            <div class="text-xl font-black tracking-tight" id="pendingDebtAmount">$ 0</div>
+          <div class="min-w-0">
+            <div class="text-xs font-medium text-amber-100 truncate">柏昇未交接現金（待收回）</div>
+            <div class="text-xl font-black tracking-tight truncate" id="pendingDebtAmount">$ 0</div>
           </div>
         </div>
-        <button onclick="openSettleModal()" class="bg-white text-amber-900 text-xs font-black px-4 py-2.5 rounded-2xl tap-effect shadow-sm">
-          奕昕確認收回
+        <button onclick="openSettleModal()" class="bg-white text-amber-900 text-xs font-black px-3.5 py-2.5 rounded-2xl tap-effect shadow-sm shrink-0">
+          奕昕收回
         </button>
       </div>
 
       <!-- 每日清機登記表單 -->
       <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 space-y-4">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-          <div class="text-sm font-black text-slate-800 flex items-center gap-2">
+        
+        <!-- 標題與日期時間排在同一行 -->
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3 gap-2">
+          <div class="text-sm font-black text-slate-800 flex items-center gap-2 shrink-0">
             <i class="fa-solid fa-pen-to-square text-indigo-600"></i>
             <span id="formTitle">機台巡檢與收支登記</span>
           </div>
-          <button id="cancelEditBtn" onclick="cancelEdit()" class="text-xs text-rose-500 font-bold hidden tap-effect">取消編輯</button>
+
+          <!-- 右側日期與時間整合選單 -->
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-xl px-2 py-1">
+            <input type="date" id="recordDate" class="text-[11px] bg-transparent outline-none text-indigo-600 font-extrabold w-22">
+            <span class="text-slate-300">|</span>
+            <input type="time" id="recordTime" class="text-[11px] bg-transparent outline-none text-slate-700 font-extrabold w-13">
+          </div>
         </div>
+
+        <button id="cancelEditBtn" onclick="cancelEdit()" class="text-xs text-rose-500 font-bold hidden tap-effect -mt-2">取消編輯</button>
 
         <form id="recordForm" class="space-y-4">
           <input type="hidden" id="editingId" value="">
           
-          <!-- 處理人員 (柏昇藍 vs 奕昕紫紅) -->
+          <!-- 處理人員 -->
           <div class="space-y-1.5">
             <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">處理人員</label>
             <div class="grid grid-cols-2 gap-2.5">
@@ -154,37 +170,29 @@
             </label>
           </div>
 
-          <!-- 日期時間與備註 -->
-          <div class="grid grid-cols-2 gap-2.5">
-            <div class="bg-slate-50 rounded-2xl px-3 py-2 flex items-center justify-between border border-slate-100">
-              <span class="text-[11px] text-slate-400 font-bold">時間</span>
-              <div class="flex gap-1">
-                <input type="date" id="recordDate" class="text-xs bg-transparent outline-none text-indigo-600 font-bold w-24">
-                <input type="time" id="recordTime" class="text-xs bg-transparent outline-none text-slate-700 font-bold w-14">
-              </div>
-            </div>
-            <div class="bg-slate-50 rounded-2xl px-3 py-2 flex items-center gap-2 border border-slate-100">
-              <span class="text-[11px] text-slate-400 font-bold">備註</span>
-              <input type="text" id="notes" placeholder="選填備註" class="text-xs bg-transparent outline-none flex-1 text-slate-700 placeholder:text-slate-300 font-bold">
+          <!-- 備註欄位 -->
+          <div class="space-y-1.5">
+            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">備註說明</label>
+            <div class="bg-slate-50 rounded-2xl px-3 py-2.5 border border-slate-100 flex items-center gap-2">
+              <i class="fa-regular fa-note-sticky text-slate-400 text-xs"></i>
+              <input type="text" id="notes" placeholder="選填備註（例如：補滿硬幣、機台保養等）" class="text-xs bg-transparent outline-none w-full text-slate-700 placeholder:text-slate-300 font-bold">
             </div>
           </div>
 
-          <!-- 金額輸入區：拿走鈔票 (綠) vs 補進10元 (藍) -->
+          <!-- 金額輸入區 -->
           <div class="grid grid-cols-2 gap-3">
-            <!-- 拿走鈔票 ($) -->
             <div onclick="openCalculator('cashTaken', '拿走鈔票金額')" class="bg-emerald-50/50 hover:bg-emerald-50 border-2 border-emerald-500/20 rounded-2xl p-3.5 cursor-pointer transition shadow-xs">
               <div class="text-[11px] text-emerald-700 font-bold flex justify-between items-center">
-                <span><i class="fa-solid fa-money-bill-1-wave"></i> 拿走鈔票 ($)</span>
+                <span class="truncate">拿走鈔票 ($)</span>
                 <i class="fa-solid fa-calculator text-emerald-600"></i>
               </div>
               <div class="text-xl font-black text-emerald-600 mt-1.5 truncate" id="cashTakenDisplay">$ 0</div>
               <input type="hidden" id="cashTaken" value="">
             </div>
 
-            <!-- 補進 10元 ($) -->
             <div onclick="openCalculator('coinsAdded', '補進 10元金額')" class="bg-blue-50/50 hover:bg-blue-50 border-2 border-blue-500/20 rounded-2xl p-3.5 cursor-pointer transition shadow-xs">
               <div class="text-[11px] text-blue-700 font-bold flex justify-between items-center">
-                <span><i class="fa-solid fa-coins"></i> 補進 10元 ($)</span>
+                <span class="truncate">補進 10元 ($)</span>
                 <i class="fa-solid fa-calculator text-blue-600"></i>
               </div>
               <div class="text-xl font-black text-blue-600 mt-1.5 truncate" id="coinsAddedDisplay">$ 0</div>
@@ -226,17 +234,17 @@
       <div class="grid grid-cols-3 gap-2.5">
         <div class="bg-white rounded-3xl p-3.5 shadow-sm border border-slate-100 text-center flex flex-col justify-between">
           <div class="text-[10px] text-slate-400 font-bold">總取鈔</div>
-          <div class="text-sm font-black text-emerald-600 my-1" id="monthTotalCash">$0</div>
+          <div class="text-sm font-black text-emerald-600 my-1 truncate" id="monthTotalCash">$0</div>
           <div class="text-[9px] text-slate-400 font-medium">鈔票營收</div>
         </div>
         <div class="bg-white rounded-3xl p-3.5 shadow-sm border border-slate-100 text-center flex flex-col justify-between">
           <div class="text-[10px] text-slate-400 font-bold">總補幣</div>
-          <div class="text-sm font-black text-blue-600 my-1" id="monthTotalCoins">$0</div>
+          <div class="text-sm font-black text-blue-600 my-1 truncate" id="monthTotalCoins">$0</div>
           <div class="text-[9px] text-slate-400 font-medium">硬幣投入</div>
         </div>
         <div class="bg-white rounded-3xl p-3.5 shadow-sm border border-slate-100 text-center flex flex-col justify-between">
           <div class="text-[10px] text-slate-400 font-bold">平均補幣</div>
-          <div class="text-sm font-black text-purple-600 my-1" id="avgRefillDays">-- 天</div>
+          <div class="text-sm font-black text-purple-600 my-1 truncate" id="avgRefillDays">-- 天</div>
           <div class="text-[9px] text-slate-400 font-medium">頻率週期</div>
         </div>
       </div>
@@ -290,12 +298,10 @@
         </button>
       </div>
 
-      <!-- 計算機螢幕顯示 -->
       <div class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-right">
         <div class="text-3xl font-black text-slate-900 tracking-tight truncate" id="calcScreen">0</div>
       </div>
 
-      <!-- 快捷加值按鈕 -->
       <div class="grid grid-cols-4 gap-2">
         <button type="button" onclick="calcQuickAdd(100)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold py-2.5 rounded-xl tap-effect">+100</button>
         <button type="button" onclick="calcQuickAdd(500)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold py-2.5 rounded-xl tap-effect">+500</button>
@@ -303,7 +309,6 @@
         <button type="button" onclick="calcQuickAdd(5000)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold py-2.5 rounded-xl tap-effect">+5,000</button>
       </div>
 
-      <!-- 數字鍵盤 -->
       <div class="grid grid-cols-3 gap-2 text-base font-bold text-slate-700">
         <button type="button" onclick="calcAppend('1')" class="bg-slate-100 hover:bg-slate-200 py-3.5 rounded-2xl tap-effect">1</button>
         <button type="button" onclick="calcAppend('2')" class="bg-slate-100 hover:bg-slate-200 py-3.5 rounded-2xl tap-effect">2</button>
@@ -319,7 +324,6 @@
         <button type="button" onclick="calcBackspace()" class="bg-slate-100 hover:bg-slate-200 py-3.5 rounded-2xl tap-effect text-sm"><i class="fa-solid fa-delete-left"></i></button>
       </div>
 
-      <!-- 確認套用按鈕 -->
       <button type="button" onclick="confirmCalculator()" class="w-full bg-indigo-600 text-white py-3.5 rounded-2xl font-black text-sm shadow-md shadow-indigo-600/30 tap-effect">
         確認套用金額
       </button>
@@ -330,7 +334,7 @@
 
   <!-- 奕昕確認收回對話框 (Modal) -->
   <div id="settleModal" class="fixed inset-0 z-50 bg-slate-900/40 ios-blur flex items-center justify-center px-4 hidden">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-xl">
+    <div class="bg-white rounded-3xl max-w-xs w-full p-6 space-y-4 shadow-xl">
       <h3 class="text-base font-black text-slate-900">確認收回現金交接</h3>
       <p class="text-xs text-slate-500">請選擇奕昕實際收到款項的日期與時間：</p>
       
@@ -347,7 +351,7 @@
 
       <div class="flex gap-2.5 pt-2">
         <button type="button" onclick="closeSettleModal()" class="flex-1 bg-slate-100 text-slate-700 py-3 rounded-2xl text-xs font-bold tap-effect">取消</button>
-        <button type="button" onclick="confirmSettle()" class="flex-1 bg-amber-500 text-white py-3 rounded-2xl text-xs font-bold tap-effect shadow-md shadow-amber-500/20">確認完成收回</button>
+        <button type="button" onclick="confirmSettle()" class="flex-1 bg-amber-500 text-white py-3 rounded-2xl text-xs font-bold tap-effect shadow-md shadow-amber-500/20">確認收回</button>
       </div>
     </div>
   </div>
@@ -410,6 +414,7 @@
         headerTitle.innerText = "營收圖表分析";
         renderChart();
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.openCalculator = function(fieldId, titleText) {
@@ -514,7 +519,6 @@
               unSettledRecords.push(id);
             }
 
-            // 人員鮮明標籤：柏昇(天空藍) vs 奕昕(粉紫紅)
             let operatorBadge = operator === '柏昇' 
               ? `<span class="text-[10px] text-white bg-sky-500 px-2 py-0.5 rounded-lg font-black shadow-xs">柏昇</span>`
               : `<span class="text-[10px] text-white bg-fuchsia-600 px-2 py-0.5 rounded-lg font-black shadow-xs">奕昕</span>`;
@@ -532,7 +536,7 @@
 
             html += `
               <div class="py-3 px-1 flex items-center justify-between">
-                <div>
+                <div class="min-w-0 pr-2">
                   <div class="text-xs font-black text-slate-900 flex items-center gap-1.5 flex-wrap">
                     <span>${data.date}${timeStr}</span>
                     ${operatorBadge}
@@ -543,7 +547,7 @@
                     <span class="text-blue-600">補幣: +$${coins.toLocaleString()}</span>
                   </div>
                 </div>
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1 shrink-0">
                   <button onclick="editRecord('${id}')" class="text-slate-300 hover:text-indigo-600 p-2 text-xs tap-effect"><i class="fa-regular fa-pen-to-square text-sm"></i></button>
                   <button onclick="deleteRecord('${id}')" class="text-slate-300 hover:text-rose-500 p-2 text-xs tap-effect"><i class="fa-regular fa-trash-can text-sm"></i></button>
                 </div>
