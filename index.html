@@ -9,18 +9,17 @@
   <!-- FontAwesome 圖示庫 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* iOS 系統字體與原生觸控體驗優化 */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "PingFang TC", "Helvetica Neue", Helvetica, Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
-      background-color: #F2F2F7; /* iOS 預設背景色 */
+      background-color: #F4F4F6;
     }
     .ios-blur {
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
     }
     .tap-effect:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
       transition: transform 0.1s ease;
     }
     .no-scrollbar::-webkit-scrollbar {
@@ -32,269 +31,321 @@
     }
   </style>
 </head>
-<body class="text-[#1C1C1E] min-h-screen flex flex-col justify-between select-none">
+<body class="text-[#1C1C1E] min-h-screen flex flex-col justify-between select-none pb-20">
 
-  <!-- 頂部 iOS 導航列 (含毛玻璃模糊效果與分頁切換) -->
-  <header class="sticky top-0 z-50 bg-[#F2F2F7]/80 ios-blur border-b border-gray-200/60 pt-safe">
-    <div class="max-w-md mx-auto px-5 py-3 flex justify-between items-center">
-      <div>
-        <span class="text-[11px] font-semibold tracking-wider text-gray-500 uppercase">Claw Machine</span>
-        <h1 class="text-xl font-bold text-black tracking-tight flex items-center gap-1.5" id="headerTitle">
-          兌幣機管理
-        </h1>
-      </div>
+  <!-- 頂部精簡導航列 -->
+  <header class="sticky top-0 z-40 bg-white/85 ios-blur border-b border-gray-100 pt-safe shadow-sm">
+    <div class="max-w-md mx-auto px-4 py-2 flex justify-between items-center">
       <div class="flex items-center gap-2">
-        <!-- 分頁切換按鈕 -->
-        <div class="bg-gray-200/80 p-0.5 rounded-xl flex text-xs font-semibold">
-          <button onclick="switchTab('manage')" id="tabManageBtn" class="px-3 py-1.5 rounded-lg bg-white text-[#007AFF] shadow-sm transition">管理</button>
-          <button onclick="switchTab('chart')" id="tabChartBtn" class="px-3 py-1.5 rounded-lg text-gray-600 transition">圖表</button>
+        <div class="w-7 h-7 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xs shadow-md shadow-blue-500/20">
+          <i class="fa-solid fa-gamepad"></i>
         </div>
-        <button onclick="fetchData()" class="w-8 h-8 rounded-full bg-gray-200/70 text-[#007AFF] flex items-center justify-center tap-effect text-sm">
-          <i class="fa-solid fa-arrows-rotate"></i>
-        </button>
+        <h1 class="text-sm font-extrabold text-gray-900 tracking-tight" id="headerTitle">兌幣機管理系統</h1>
       </div>
+      <button onclick="fetchData()" class="w-7 h-7 rounded-full bg-gray-100 text-[#007AFF] flex items-center justify-center tap-effect text-xs shadow-sm">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </button>
     </div>
   </header>
 
   <!-- 主內容區 -->
-  <main class="max-w-md mx-auto w-full px-4 pt-3 pb-8 space-y-5 flex-1">
+  <main class="max-w-md mx-auto w-full px-3 pt-3 space-y-3 flex-1">
 
     <!-- ==================== 分頁一：管理登記頁面 ==================== -->
-    <div id="tabManageContent" class="space-y-5">
+    <div id="tabManageContent" class="space-y-3">
       
-      <!-- 幣量低於 10,000 警告橫幅 (預設隱藏) -->
-      <div id="coinWarningAlert" class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3 hidden animate-pulse">
-        <div class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center text-lg font-bold shrink-0">
+      <!-- 幣量低於 10,000 警告橫幅 -->
+      <div id="coinWarningAlert" class="bg-red-50 border border-red-200 rounded-2xl p-3 flex items-center gap-3 hidden animate-pulse shadow-sm">
+        <div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-md shadow-red-500/30">
           <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
         <div>
-          <div class="text-xs font-bold text-red-800">⚠️ 機台幣量嚴重不足警告！</div>
-          <div class="text-xs text-red-600 mt-0.5">目前剩餘硬幣低於 $10,000，請盡快前往補幣！</div>
+          <div class="text-xs font-bold text-red-800">⚠️ 機台硬幣嚴重不足警告！</div>
+          <div class="text-[11px] text-red-600">剩餘硬幣低於 $10,000，請盡快安排補幣！</div>
         </div>
       </div>
 
-      <!-- 儀表板卡片 (iOS Widget 風格) -->
-      <div class="grid grid-cols-2 gap-3">
+      <!-- 儀表板卡片 (高對比鮮明版) -->
+      <div class="grid grid-cols-2 gap-2.5">
         <!-- 剩餘 10 元硬幣 -->
-        <div class="bg-white rounded-2xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col justify-between">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-full bg-[#007AFF]/10 text-[#007AFF] flex items-center justify-center text-xs">
+        <div class="bg-white rounded-2xl p-3.5 shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col justify-between">
+          <div class="flex items-center gap-1.5">
+            <div class="w-5 h-5 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center text-[10px]">
               <i class="fa-solid fa-coins"></i>
             </div>
-            <span class="text-xs font-medium text-gray-500">機台剩餘硬幣</span>
+            <span class="text-[11px] font-bold text-gray-400">機台剩餘硬幣</span>
           </div>
-          <div class="my-2">
-            <div class="text-2xl font-bold text-gray-900 tracking-tight" id="currentCoins">$ 25,000</div>
-            <div class="text-[11px] text-gray-400 font-medium mt-0.5" id="coinCount">約 2,500 枚 10元</div>
+          <div class="my-1.5">
+            <div class="text-xl font-black text-gray-900 tracking-tight" id="currentCoins">$ 25,000</div>
+            <div class="text-[10px] text-gray-400 font-semibold" id="coinCount">約 2,500 枚</div>
           </div>
-          <div class="text-[10px] text-gray-400 bg-gray-50 py-1 px-2 rounded-md inline-block self-start font-medium">初始底池 $25,000 (9/4)</div>
+          <span class="text-[9px] text-blue-600 bg-blue-50 py-0.5 px-1.5 rounded-md inline-block self-start font-bold">初始 $25,000 (9/4)</span>
         </div>
 
-        <!-- 累計營收 (收回鈔票) -->
-        <div class="bg-white rounded-2xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col justify-between">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-full bg-[#34C759]/10 text-[#34C759] flex items-center justify-center text-xs">
+        <!-- 累計取走鈔票 (鮮明綠) -->
+        <div class="bg-white rounded-2xl p-3.5 shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col justify-between">
+          <div class="flex items-center gap-1.5">
+            <div class="w-5 h-5 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-[10px]">
               <i class="fa-solid fa-money-bill-wave"></i>
             </div>
-            <span class="text-xs font-medium text-gray-500">累計取走鈔票</span>
+            <span class="text-[11px] font-bold text-gray-400">累計取走鈔票</span>
           </div>
-          <div class="my-2">
-            <div class="text-2xl font-bold text-[#34C759] tracking-tight" id="totalCashTaken">$ 0</div>
-            <div class="text-[11px] text-gray-400 font-medium mt-0.5" id="totalCoinsAdded">補幣累計: $0</div>
+          <div class="my-1.5">
+            <div class="text-xl font-black text-emerald-600 tracking-tight" id="totalCashTaken">$ 0</div>
+            <div class="text-[10px] text-gray-400 font-semibold" id="totalCoinsAdded">補幣累計: $0</div>
           </div>
-          <div class="text-[10px] text-[#34C759] bg-green-50 py-1 px-2 rounded-md inline-block self-start font-medium">歷史總營收</div>
+          <span class="text-[9px] text-emerald-700 bg-emerald-50 py-0.5 px-1.5 rounded-md inline-block self-start font-bold">歷史總營收</span>
         </div>
       </div>
 
       <!-- 柏昇交接給奕昕的欠款狀態卡片 -->
-      <div id="debtCard" class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between hidden">
+      <div id="debtCard" class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-2xl p-3.5 flex items-center justify-between shadow-sm hidden">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center text-lg font-bold">
+          <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-md shadow-amber-500/30">
             <i class="fa-solid fa-hand-holding-dollar"></i>
           </div>
           <div>
-            <div class="text-xs font-semibold text-amber-800">柏昇未交接現金（欠款）</div>
-            <div class="text-xl font-bold text-amber-900" id="pendingDebtAmount">$ 0</div>
+            <div class="text-[11px] font-bold text-amber-800">柏昇未交接現金（欠款）</div>
+            <div class="text-lg font-black text-amber-900" id="pendingDebtAmount">$ 0</div>
           </div>
         </div>
-        <button onclick="openSettleModal()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl tap-effect shadow-sm">
+        <button onclick="openSettleModal()" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold px-3 py-2 rounded-xl tap-effect shadow-sm">
           奕昕確認收回
         </button>
       </div>
 
       <!-- 每日清機登記表單 -->
-      <div>
-        <div class="flex justify-between items-center px-3 mb-1.5">
-          <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider" id="formTitle">每日抄表與補幣</div>
-          <button id="cancelEditBtn" onclick="cancelEdit()" class="text-xs text-red-500 font-medium hidden tap-effect">取消編輯</button>
+      <div class="bg-white rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.03)] border border-gray-100 p-3.5 space-y-3">
+        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+          <div class="text-xs font-extrabold text-gray-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-pen-to-square text-indigo-500"></i>
+            <span id="formTitle">機台巡檢與收支登記</span>
+          </div>
+          <button id="cancelEditBtn" onclick="cancelEdit()" class="text-[11px] text-red-500 font-bold hidden tap-effect">取消編輯</button>
         </div>
-        
-        <form id="recordForm" class="bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 divide-y divide-gray-100 overflow-hidden">
+
+        <form id="recordForm" class="space-y-3">
           <input type="hidden" id="editingId" value="">
           
-          <!-- 處理人員 -->
-          <div class="flex items-center justify-between px-4 py-3">
-            <label class="text-sm font-medium text-gray-800 w-28">處理人員</label>
-            <div class="flex gap-2">
-              <label class="cursor-pointer text-sm font-medium px-3 py-1 rounded-lg border border-gray-200 transition select-none flex items-center gap-1.5 bg-gray-50 text-gray-700 has-[:checked]:bg-[#007AFF]/10 has-[:checked]:text-[#007AFF] has-[:checked]:border-[#007AFF]">
-                <input type="radio" name="operator" value="柏昇" class="hidden" checked> 柏昇
+          <!-- 處理人員 (柏昇藍 vs 奕昕紫紅 鮮明對比) -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">處理人員</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="cursor-pointer text-center text-xs font-bold py-2 rounded-xl border-2 transition select-none flex items-center justify-center gap-1.5 bg-gray-50 text-gray-500 border-gray-100 has-[:checked]:bg-blue-600 has-[:checked]:text-white has-[:checked]:border-blue-600 has-[:checked]:shadow-md has-[:checked]:shadow-blue-500/30">
+                <input type="radio" name="operator" value="柏昇" class="hidden" checked> 
+                <i class="fa-solid fa-user-astronaut"></i> 柏昇 (藍)
               </label>
-              <label class="cursor-pointer text-sm font-medium px-3 py-1 rounded-lg border border-gray-200 transition select-none flex items-center gap-1.5 bg-gray-50 text-gray-700 has-[:checked]:bg-[#007AFF]/10 has-[:checked]:text-[#007AFF] has-[:checked]:border-[#007AFF]">
-                <input type="radio" name="operator" value="奕昕" class="hidden"> 奕昕
+              <label class="cursor-pointer text-center text-xs font-bold py-2 rounded-xl border-2 transition select-none flex items-center justify-center gap-1.5 bg-gray-50 text-gray-500 border-gray-100 has-[:checked]:bg-fuchsia-600 has-[:checked]:text-white has-[:checked]:border-fuchsia-600 has-[:checked]:shadow-md has-[:checked]:shadow-fuchsia-500/30">
+                <input type="radio" name="operator" value="奕昕" class="hidden"> 
+                <i class="fa-solid fa-user-ninja"></i> 奕昕 (紫)
               </label>
             </div>
           </div>
 
           <!-- 交易性質 -->
-          <div class="flex items-center justify-between px-4 py-3">
-            <label class="text-sm font-medium text-gray-800 w-28">交易性質</label>
-            <div class="flex gap-2">
-              <label class="cursor-pointer text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-200 transition select-none flex items-center gap-1 bg-gray-50 text-gray-700 has-[:checked]:bg-blue-50 has-[:checked]:text-[#007AFF] has-[:checked]:border-[#007AFF]">
-                <input type="radio" name="txType" value="normal" class="hidden" checked> 一般取鈔交接
-              </label>
-              <label class="cursor-pointer text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-200 transition select-none flex items-center gap-1 bg-gray-50 text-gray-700 has-[:checked]:bg-purple-50 has-[:checked]:text-purple-600 has-[:checked]:border-purple-300">
-                <input type="radio" name="txType" value="exchange" class="hidden"> 台主換幣 (不需交給奕昕)
-              </label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="cursor-pointer text-center text-[11px] font-bold py-1.5 rounded-xl border transition select-none bg-gray-50 text-gray-600 border-gray-200 has-[:checked]:bg-blue-50 has-[:checked]:text-blue-700 has-[:checked]:border-blue-300 has-[:checked]:font-extrabold">
+              <input type="radio" name="txType" value="normal" class="hidden" checked> 一般交接 (需收回)
+            </label>
+            <label class="cursor-pointer text-center text-[11px] font-bold py-1.5 rounded-xl border transition select-none bg-gray-50 text-gray-600 border-gray-200 has-[:checked]:bg-purple-50 has-[:checked]:text-purple-700 has-[:checked]:border-purple-300 has-[:checked]:font-extrabold">
+              <input type="radio" name="txType" value="exchange" class="hidden"> 台主換幣 (不交接)
+            </label>
+          </div>
+
+          <!-- 日期時間與備註 -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-gray-50 rounded-xl px-2.5 py-1.5 flex items-center justify-between border border-gray-200">
+              <span class="text-[10px] text-gray-400 font-bold">時間</span>
+              <div class="flex gap-1">
+                <input type="date" id="recordDate" class="text-[11px] bg-transparent outline-none text-[#007AFF] font-bold w-20">
+                <input type="time" id="recordTime" class="text-[11px] bg-transparent outline-none text-gray-700 font-bold w-12">
+              </div>
+            </div>
+            <div class="bg-gray-50 rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 border border-gray-200">
+              <span class="text-[10px] text-gray-400 font-bold">備註</span>
+              <input type="text" id="notes" placeholder="選填備註" class="text-[11px] bg-transparent outline-none flex-1 text-gray-700 placeholder:text-gray-300 font-bold">
             </div>
           </div>
 
-          <!-- 抄表日期與時間 -->
-          <div class="flex items-center justify-between px-4 py-3">
-            <label class="text-sm font-medium text-gray-800 w-28">抄表日期時間</label>
-            <div class="flex items-center gap-2">
-              <input type="date" id="recordDate" class="text-sm text-right bg-transparent outline-none text-[#007AFF] font-medium" required>
-              <input type="time" id="recordTime" class="text-sm text-right bg-transparent outline-none text-gray-600 font-medium" required>
+          <!-- 金額輸入區：拿走鈔票 (鮮明綠) vs 補進10元 (鮮明藍) -->
+          <div class="grid grid-cols-2 gap-2.5">
+            <!-- 拿走鈔票 ($) -> 綠色系 -->
+            <div onclick="openCalculator('cashTaken', '拿走鈔票金額')" class="bg-emerald-50/60 hover:bg-emerald-50 border-2 border-emerald-500/30 rounded-2xl p-3 cursor-pointer transition shadow-sm">
+              <div class="text-[10px] text-emerald-700 font-bold flex justify-between items-center">
+                <span><i class="fa-solid fa-money-bill-1-wave"></i> 拿走鈔票 ($)</span>
+                <i class="fa-solid fa-calculator text-emerald-600"></i>
+              </div>
+              <div class="text-lg font-black text-emerald-600 mt-1 truncate" id="cashTakenDisplay">$ 0</div>
+              <input type="hidden" id="cashTaken" value="">
             </div>
-          </div>
 
-          <!-- 拿走鈔票 -->
-          <div class="px-4 py-3 space-y-2">
-            <div class="flex items-center justify-between">
-              <label class="text-sm font-medium text-gray-800 w-32">拿走鈔票 ($)</label>
-              <input type="number" id="cashTaken" inputmode="numeric" placeholder="沒填則為 0" class="text-sm text-right bg-transparent outline-none flex-1 font-semibold text-gray-900 placeholder:text-gray-300">
+            <!-- 補進 10元 ($) -> 藍色系 -->
+            <div onclick="openCalculator('coinsAdded', '補進 10元金額')" class="bg-blue-50/60 hover:bg-blue-50 border-2 border-blue-500/30 rounded-2xl p-3 cursor-pointer transition shadow-sm">
+              <div class="text-[10px] text-blue-700 font-bold flex justify-between items-center">
+                <span><i class="fa-solid fa-coins"></i> 補進 10元 ($)</span>
+                <i class="fa-solid fa-calculator text-blue-600"></i>
+              </div>
+              <div class="text-lg font-black text-blue-600 mt-1 truncate" id="coinsAddedDisplay">$ 0</div>
+              <input type="hidden" id="coinsAdded" value="">
             </div>
-            <div class="flex gap-1.5 justify-end pt-1">
-              <button type="button" onclick="addAmount('cashTaken', 1000)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-md tap-effect font-medium">+1,000</button>
-              <button type="button" onclick="addAmount('cashTaken', 3000)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-md tap-effect font-medium">+3,000</button>
-              <button type="button" onclick="addAmount('cashTaken', 5000)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-md tap-effect font-medium">+5,000</button>
-              <button type="button" onclick="addAmount('cashTaken', 10000)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-md tap-effect font-medium">+10,000</button>
-            </div>
-          </div>
-
-          <!-- 補進10元 -->
-          <div class="px-4 py-3 space-y-2">
-            <div class="flex items-center justify-between">
-              <label class="text-sm font-medium text-gray-800 w-32">補進 10元 ($)</label>
-              <input type="number" id="coinsAdded" inputmode="numeric" placeholder="沒填則為 0" class="text-sm text-right bg-transparent outline-none flex-1 font-semibold text-[#007AFF] placeholder:text-gray-300">
-            </div>
-            <div class="flex gap-1.5 justify-end pt-1">
-              <button type="button" onclick="addAmount('coinsAdded', 1000)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-md tap-effect font-medium">+1,000</button>
-              <button type="button" onclick="addAmount('coinsAdded', 3000)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-md tap-effect font-medium">+3,000</button>
-              <button type="button" onclick="addAmount('coinsAdded', 5000)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-md tap-effect font-medium">+5,000</button>
-              <button type="button" onclick="addAmount('coinsAdded', 10000)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-md tap-effect font-medium">+10,000</button>
-            </div>
-          </div>
-
-          <!-- 備註 -->
-          <div class="flex items-center justify-between px-4 py-3">
-            <label class="text-sm font-medium text-gray-800 w-24">備註</label>
-            <input type="text" id="notes" placeholder="選填 (如：補滿鈔箱)" class="text-sm text-right bg-transparent outline-none flex-1 text-gray-600 placeholder:text-gray-300">
           </div>
 
           <!-- 提交按鈕 -->
-          <div class="p-3 bg-white">
-            <button type="submit" id="submitBtn" class="w-full bg-[#007AFF] text-white py-3 rounded-xl font-semibold text-sm shadow-sm tap-effect flex items-center justify-center gap-2">
-              <i class="fa-solid fa-check"></i>
-              儲存今日紀錄
-            </button>
-          </div>
+          <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-2xl font-black text-xs shadow-lg shadow-indigo-600/30 tap-effect flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-circle-check text-sm"></i>
+            儲存今日登記紀錄
+          </button>
         </form>
       </div>
 
-      <!-- 歷史明細列表 -->
-      <div>
-        <div class="text-xs font-semibold text-gray-500 uppercase px-3 mb-1.5 tracking-wider">最近抄表紀錄</div>
-        <div class="bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden divide-y divide-gray-100" id="historyList">
-          <div class="p-6 text-center text-xs text-gray-400">載入中...</div>
+      <!-- 最近紀錄縮編 -->
+      <div class="bg-white rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.03)] border border-gray-100 p-3.5 space-y-2">
+        <div class="text-xs font-bold text-gray-800 px-0.5 flex justify-between items-center">
+          <span>最近抄表紀錄</span>
+          <span class="text-[10px] text-gray-400 font-normal">柏昇(藍) / 奕昕(紫)</span>
+        </div>
+        <div class="divide-y divide-gray-100 max-h-40 overflow-y-auto no-scrollbar" id="historyList">
+          <div class="p-3 text-center text-xs text-gray-400">載入中...</div>
         </div>
       </div>
     </div>
 
 
     <!-- ==================== 分頁二：營收圖表分析頁面 ==================== -->
-    <div id="tabChartContent" class="space-y-5 hidden">
+    <div id="tabChartContent" class="space-y-3 hidden">
       
       <!-- 月份選擇卡片 -->
-      <div class="bg-white rounded-2xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 flex items-center justify-between">
-        <span class="text-sm font-bold text-gray-800">選擇統計月份</span>
-        <input type="month" id="chartMonthSelect" onchange="renderChart()" class="bg-gray-50 text-sm font-semibold text-[#007AFF] border border-gray-200 rounded-xl px-3 py-1.5 outline-none">
+      <div class="bg-white rounded-2xl p-3.5 shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-gray-100 flex items-center justify-between">
+        <span class="text-xs font-bold text-gray-800">選擇統計月份</span>
+        <input type="month" id="chartMonthSelect" onchange="renderChart()" class="bg-gray-50 text-xs font-black text-indigo-600 border border-gray-200 rounded-xl px-3 py-1.5 outline-none">
       </div>
 
-      <!-- 月份統計摘要卡片 -->
+      <!-- 月份統計摘要 -->
       <div class="grid grid-cols-3 gap-2">
-        <div class="bg-white rounded-2xl p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 text-center flex flex-col justify-between">
-          <div class="text-[11px] text-gray-400 font-medium">總取鈔</div>
-          <div class="text-sm font-bold text-[#34C759] my-1" id="monthTotalCash">$0</div>
+        <div class="bg-white rounded-2xl p-3 shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-gray-100 text-center flex flex-col justify-between">
+          <div class="text-[10px] text-gray-400 font-bold">總取鈔</div>
+          <div class="text-sm font-black text-emerald-600 my-1" id="monthTotalCash">$0</div>
           <div class="text-[9px] text-gray-400">鈔票營收</div>
         </div>
-        <div class="bg-white rounded-2xl p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 text-center flex flex-col justify-between">
-          <div class="text-[11px] text-gray-400 font-medium">總補幣</div>
-          <div class="text-sm font-bold text-[#007AFF] my-1" id="monthTotalCoins">$0</div>
+        <div class="bg-white rounded-2xl p-3 shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-gray-100 text-center flex flex-col justify-between">
+          <div class="text-[10px] text-gray-400 font-bold">總補幣</div>
+          <div class="text-sm font-black text-blue-600 my-1" id="monthTotalCoins">$0</div>
           <div class="text-[9px] text-gray-400">硬幣投入</div>
         </div>
-        <div class="bg-white rounded-2xl p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 text-center flex flex-col justify-between">
-          <div class="text-[11px] text-gray-400 font-medium">平均補幣頻率</div>
-          <div class="text-sm font-bold text-purple-600 my-1" id="avgRefillDays">-- 天</div>
+        <div class="bg-white rounded-2xl p-3 shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-gray-100 text-center flex flex-col justify-between">
+          <div class="text-[10px] text-gray-400 font-bold">平均補幣頻率</div>
+          <div class="text-sm font-black text-purple-600 my-1" id="avgRefillDays">-- 天</div>
           <div class="text-[9px] text-gray-400">每幾天補一次</div>
         </div>
       </div>
 
       <!-- 圖表顯示卡片 -->
-      <div class="bg-white rounded-2xl p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 space-y-4">
+      <div class="bg-white rounded-2xl p-4 shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-gray-100 space-y-3">
         <div class="flex justify-between items-center">
-          <h3 class="text-sm font-bold text-gray-800">每日硬幣消耗量趨勢圖</h3>
-          <div class="flex items-center gap-3 text-[11px] font-medium text-gray-500">
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> 當日消耗幣量 ($)</span>
-          </div>
+          <h3 class="text-xs font-bold text-gray-800">每日硬幣消耗量趨勢圖</h3>
+          <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">消耗幣量 ($)</span>
         </div>
-
-        <!-- 直條圖容器 -->
-        <div class="overflow-x-auto no-scrollbar pt-4 pb-2">
-          <div id="chartBarsContainer" class="flex items-end gap-3 min-w-full h-48 px-2 border-b border-gray-200">
+        <div class="overflow-x-auto no-scrollbar pt-2 pb-1">
+          <div id="chartBarsContainer" class="flex items-end gap-2.5 min-w-full h-40 px-1 border-b border-gray-100">
             <div class="w-full text-center text-xs text-gray-400 self-center">載入圖表中...</div>
           </div>
         </div>
       </div>
 
       <!-- 該月每日明細列表 -->
-      <div class="bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden divide-y divide-gray-100" id="chartDetailList">
-        <div class="p-4 text-center text-xs text-gray-400">尚無資料</div>
+      <div class="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-gray-100 overflow-hidden divide-y divide-gray-50 max-h-48 overflow-y-auto no-scrollbar" id="chartDetailList">
+        <div class="p-3 text-center text-xs text-gray-400">尚無資料</div>
       </div>
 
     </div>
 
   </main>
 
+
+  <!-- ==================== 底部固定導航列 (Tab Bar) ==================== -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 ios-blur border-t border-gray-200/60 pb-safe shadow-lg">
+    <div class="max-w-md mx-auto grid grid-cols-2 py-2 px-6">
+      <button onclick="switchTab('manage')" id="navManageBtn" class="flex flex-col items-center gap-1 text-indigo-600 font-black tap-effect">
+        <i class="fa-solid fa-cash-register text-base"></i>
+        <span class="text-[10px]">管理登記</span>
+      </button>
+      <button onclick="switchTab('chart')" id="navChartBtn" class="flex flex-col items-center gap-1 text-gray-400 font-semibold tap-effect">
+        <i class="fa-solid fa-chart-column text-base"></i>
+        <span class="text-[10px]">營收圖表</span>
+      </button>
+    </div>
+  </nav>
+
+
+  <!-- ==================== 彈跳小計算機視窗 (Modal) ==================== -->
+  <div id="calculatorModal" class="fixed inset-0 z-50 bg-black/50 ios-blur flex items-end justify-center hidden">
+    <div class="bg-white rounded-t-3xl max-w-md w-full p-5 space-y-4 shadow-2xl animate-in slide-in-from-bottom duration-200 pb-8">
+      
+      <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+        <span class="text-xs font-bold text-gray-500" id="calcTitle">輸入金額</span>
+        <button onclick="closeCalculator()" class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs tap-effect">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- 計算機螢幕顯示 -->
+      <div class="bg-gray-50 border-2 border-gray-200 rounded-2xl p-3 text-right">
+        <div class="text-2xl font-black text-gray-900 tracking-tight truncate" id="calcScreen">0</div>
+      </div>
+
+      <!-- 快捷加值按鈕 (+100, +500, +1000, +5000) -->
+      <div class="grid grid-cols-4 gap-1.5">
+        <button type="button" onclick="calcQuickAdd(100)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold py-2 rounded-xl tap-effect">+100</button>
+        <button type="button" onclick="calcQuickAdd(500)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold py-2 rounded-xl tap-effect">+500</button>
+        <button type="button" onclick="calcQuickAdd(1000)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold py-2 rounded-xl tap-effect">+1,000</button>
+        <button type="button" onclick="calcQuickAdd(5000)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold py-2 rounded-xl tap-effect">+5,000</button>
+      </div>
+
+      <!-- 數字鍵盤 -->
+      <div class="grid grid-cols-3 gap-2 text-base font-bold text-gray-800">
+        <button type="button" onclick="calcAppend('1')" class="bg-gray-100 hover:bg-gray-200 py-3 rounded-xl tap-effect">1</button>
+        <button type="button" onclick="calcAppend('2')" class="bg-gray-100 hover:bg-gray-200 py-3 rounded-xl tap-effect">2</button>
+        <button type="button" onclick="calcAppend('3')" class="bg-gray-100 hover:bg-gray-200 py-3 rounded-xl tap-effect">3</button>
+        <button type="button" onclick="calcAppend('4')" class="bg-gray-100 hover:bg-gray-200 py-3 rounded-xl tap-effect">4</button>
+        <button type="button" onclick="calcAppend('5')" class="bg-gray-100 hover:bg-gray-200 py-3 rounded-xl tap-effect">5</button>
+        <button type="button" onclick="calcAppend('6')" class="bg-gray-100 hover:bg-gray-200 py-3 rounded-xl tap-effect">6</button>
+        <button type="button" onclick="calcAppend('7')" class="bg-gray-100 hover:bg-gray-200 py-3 rounded-xl tap-effect">7</button>
+        <button type="button" onclick="calcAppend('8')" class="bg-gray-100 hover:bg-gray-200 py-3 rounded-xl tap-effect">8</button>
+        <button type="button" onclick="calcAppend('9')" class="bg-gray-100 hover:bg-gray-200 py-3 rounded-xl tap-effect">9</button>
+        <button type="button" onclick="calcClear()" class="bg-red-50 text-red-500 hover:bg-red-100 py-3 rounded-xl tap-effect text-sm font-black">C</button>
+        <button type="button" onclick="calcAppend('0')" class="bg-gray-100 hover:bg-gray-200 py-3 rounded-xl tap-effect">0</button>
+        <button type="button" onclick="calcBackspace()" class="bg-gray-100 hover:bg-gray-200 py-3 rounded-xl tap-effect text-sm"><i class="fa-solid fa-delete-left"></i></button>
+      </div>
+
+      <!-- 確認套用按鈕 -->
+      <button type="button" onclick="confirmCalculator()" class="w-full bg-indigo-600 text-white py-3 rounded-2xl font-black text-sm shadow-md shadow-indigo-600/30 tap-effect">
+        確認套用金額
+      </button>
+
+    </div>
+  </div>
+
+
   <!-- 奕昕確認收回對話框 (Modal) -->
   <div id="settleModal" class="fixed inset-0 z-50 bg-black/40 ios-blur flex items-center justify-center px-4 hidden">
     <div class="bg-white rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-xl">
-      <h3 class="text-base font-bold text-gray-900">確認收回現金交接</h3>
+      <h3 class="text-base font-extrabold text-gray-900">確認收回現金交接</h3>
       <p class="text-xs text-gray-500">請選擇奕昕實際收到款項的日期與時間：</p>
       
       <div class="space-y-3">
         <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1">回收日期</label>
-          <input type="date" id="settleDate" class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 outline-none text-[#007AFF] font-medium">
+          <label class="text-xs font-bold text-gray-600 block mb-1">回收日期</label>
+          <input type="date" id="settleDate" class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 outline-none text-[#007AFF] font-bold">
         </div>
         <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1">回收時間</label>
-          <input type="time" id="settleTime" class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 outline-none text-gray-700 font-medium">
+          <label class="text-xs font-bold text-gray-600 block mb-1">回收時間</label>
+          <input type="time" id="settleTime" class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 outline-none text-gray-700 font-bold">
         </div>
       </div>
 
       <div class="flex gap-2 pt-2">
-        <button type="button" onclick="closeSettleModal()" class="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-xl text-xs font-semibold tap-effect">取消</button>
-        <button type="button" onclick="confirmSettle()" class="flex-1 bg-amber-600 text-white py-2.5 rounded-xl text-xs font-semibold tap-effect shadow-sm">確認完成收回</button>
+        <button type="button" onclick="closeSettleModal()" class="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-xl text-xs font-bold tap-effect">取消</button>
+        <button type="button" onclick="confirmSettle()" class="flex-1 bg-amber-600 text-white py-2.5 rounded-xl text-xs font-bold tap-effect shadow-sm">確認完成收回</button>
       </div>
     </div>
   </div>
@@ -317,7 +368,7 @@
     };
 
     const INITIAL_FLOAT = 25000; 
-    const BASE_DATE = "2026-09-04"; // 設為基準日 9/4 號初始底池 $25,000
+    const BASE_DATE = "2026-09-04"; 
     const COLLECTION_NAME = "claw_coin_records"; 
 
     const app = initializeApp(firebaseConfig);
@@ -326,6 +377,9 @@
     let unSettledRecords = [];
     window.allRecordsData = {};
     let globalRecordsList = [];
+
+    let currentCalcField = '';
+    let calcValue = '0';
 
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
@@ -336,38 +390,95 @@
     window.switchTab = function(tabName) {
       const manageContent = document.getElementById('tabManageContent');
       const chartContent = document.getElementById('tabChartContent');
-      const manageBtn = document.getElementById('tabManageBtn');
-      const chartBtn = document.getElementById('tabChartBtn');
+      const navManageBtn = document.getElementById('navManageBtn');
+      const navChartBtn = document.getElementById('navChartBtn');
       const headerTitle = document.getElementById('headerTitle');
 
       if (tabName === 'manage') {
         manageContent.classList.remove('hidden');
         chartContent.classList.add('hidden');
-        manageBtn.className = "px-3 py-1.5 rounded-lg bg-white text-[#007AFF] shadow-sm transition";
-        chartBtn.className = "px-3 py-1.5 rounded-lg text-gray-600 transition";
-        headerTitle.innerText = "兌幣機管理";
+        navManageBtn.className = "flex flex-col items-center gap-1 text-indigo-600 font-black tap-effect";
+        navChartBtn.className = "flex flex-col items-center gap-1 text-gray-400 font-semibold tap-effect";
+        headerTitle.innerText = "兌幣機管理系統";
       } else {
         manageContent.classList.add('hidden');
         chartContent.classList.remove('hidden');
-        chartBtn.className = "px-3 py-1.5 rounded-lg bg-white text-[#007AFF] shadow-sm transition";
-        manageBtn.className = "px-3 py-1.5 rounded-lg text-gray-600 transition";
+        navChartBtn.className = "flex flex-col items-center gap-1 text-indigo-600 font-black tap-effect";
+        navManageBtn.className = "flex flex-col items-center gap-1 text-gray-400 font-semibold tap-effect";
         headerTitle.innerText = "營收圖表分析";
         renderChart();
       }
     };
 
-    window.addAmount = function(elementId, amount) {
-      const input = document.getElementById(elementId);
-      const currentVal = Number(input.value) || 0;
-      input.value = currentVal + amount;
+    window.openCalculator = function(fieldId, titleText) {
+      currentCalcField = fieldId;
+      document.getElementById('calcTitle').innerText = titleText;
+      const existingVal = document.getElementById(fieldId).value;
+      calcValue = existingVal !== "" ? existingVal : "0";
+      updateCalcScreen();
+      document.getElementById('calculatorModal').classList.remove('hidden');
     };
+
+    window.closeCalculator = function() {
+      document.getElementById('calculatorModal').classList.add('hidden');
+    };
+
+    window.calcAppend = function(numStr) {
+      if (calcValue === '0') {
+        calcValue = numStr;
+      } else {
+        calcValue += numStr;
+      }
+      updateCalcScreen();
+    };
+
+    window.calcQuickAdd = function(addNum) {
+      let current = Number(calcValue) || 0;
+      calcValue = String(current + addNum);
+      updateCalcScreen();
+    };
+
+    window.calcClear = function() {
+      calcValue = '0';
+      updateCalcScreen();
+    };
+
+    window.calcBackspace = function() {
+      if (calcValue.length > 1) {
+        calcValue = calcValue.substring(0, calcValue.length - 1);
+      } else {
+        calcValue = '0';
+      }
+      updateCalcScreen();
+    };
+
+    window.updateCalcScreen = function() {
+      const num = Number(calcValue) || 0;
+      document.getElementById('calcScreen').innerText = `$ ${num.toLocaleString()}`;
+    };
+
+    window.confirmCalculator = function() {
+      const num = Number(calcValue) || 0;
+      document.getElementById(currentCalcField).value = num > 0 ? num : "";
+      const displayElem = document.getElementById(currentCalcField + 'Display');
+      displayElem.innerText = `$ ${num.toLocaleString()}`;
+      
+      // 依據欄位套用鮮明色彩
+      if (currentCalcField === 'cashTaken') {
+        displayElem.className = num > 0 ? "text-lg font-black text-emerald-600 mt-1 truncate" : "text-lg font-black text-gray-900 mt-1 truncate";
+      } else {
+        displayElem.className = num > 0 ? "text-lg font-black text-blue-600 mt-1 truncate" : "text-lg font-black text-gray-900 mt-1 truncate";
+      }
+      closeCalculator();
+    };
+
 
     async function fetchData() {
       const historyList = document.getElementById('historyList');
-      historyList.innerHTML = '<div class="p-6 text-center text-xs text-gray-400">正在同步雲端資料...</div>';
+      historyList.innerHTML = '<div class="p-4 text-center text-xs text-gray-400">正在同步雲端資料...</div>';
 
       try {
-        const q = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "desc"), limit(100));
+        const q = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "desc"), limit(30));
         const querySnapshot = await getDocs(q);
 
         let totalCashTaken = 0;
@@ -379,7 +490,7 @@
         let html = '';
 
         if (querySnapshot.empty) {
-          historyList.innerHTML = '<div class="p-6 text-center text-xs text-gray-400">尚無抄表紀錄</div>';
+          historyList.innerHTML = '<div class="p-4 text-center text-xs text-gray-400">尚無抄表紀錄</div>';
         } else {
           querySnapshot.forEach((docSnap) => {
             const data = docSnap.data();
@@ -402,39 +513,38 @@
               unSettledRecords.push(id);
             }
 
+            // 人員鮮明標籤：柏昇(藍底) vs 奕昕(紫紅底)
+            let operatorBadge = operator === '柏昇' 
+              ? `<span class="text-[10px] text-white bg-blue-600 px-2 py-0.5 rounded-md font-extrabold shadow-sm">柏昇</span>`
+              : `<span class="text-[10px] text-white bg-fuchsia-600 px-2 py-0.5 rounded-md font-extrabold shadow-sm">奕昕</span>`;
+
             let statusBadge = '';
             if (txType === 'exchange') {
-              statusBadge = `<span class="text-[10px] text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded font-medium">台主換幣</span>`;
+              statusBadge = `<span class="text-[9px] text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded font-bold">換幣</span>`;
             } else if (operator === '柏昇' && cash > 0) {
               if (isSettled) {
-                const settleInfo = data.settleTime ? ` (${data.settleDate} ${data.settleTime} 已收回)` : ' (已收回)';
-                statusBadge = `<span class="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded font-medium">奕昕已收回${settleInfo}</span>`;
+                statusBadge = `<span class="text-[9px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded font-bold">已收回</span>`;
               } else {
-                statusBadge = `<span class="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded font-medium">待奕昕收回</span>`;
+                statusBadge = `<span class="text-[9px] text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded font-extrabold animate-pulse">待收回</span>`;
               }
             }
 
             html += `
-              <div class="px-4 py-3 flex items-center justify-between">
+              <div class="py-2.5 px-1 flex items-center justify-between">
                 <div>
-                  <div class="text-sm font-semibold text-gray-900 flex items-center gap-2 flex-wrap">
+                  <div class="text-xs font-bold text-gray-900 flex items-center gap-1.5 flex-wrap">
                     <span>${data.date}${timeStr}</span>
-                    <span class="text-[11px] text-[#007AFF] bg-[#007AFF]/10 px-1.5 py-0.5 rounded font-medium">${operator}</span>
+                    ${operatorBadge}
                     ${statusBadge}
-                    ${data.notes ? `<span class="text-[10px] text-gray-500 font-normal bg-gray-100 px-1.5 py-0.5 rounded">${data.notes}</span>` : ''}
                   </div>
-                  <div class="text-xs text-gray-400 mt-1 flex gap-3">
-                    <span class="text-[#34C759] font-medium">取鈔: +$${cash.toLocaleString()}</span>
-                    <span class="text-[#007AFF] font-medium">補幣: +$${coins.toLocaleString()}</span>
+                  <div class="text-[11px] text-gray-500 mt-1 flex gap-3 font-semibold">
+                    <span class="text-emerald-600">取鈔: +$${cash.toLocaleString()}</span>
+                    <span class="text-blue-600">補幣: +$${coins.toLocaleString()}</span>
                   </div>
                 </div>
                 <div class="flex items-center gap-1">
-                  <button onclick="editRecord('${id}')" class="text-gray-400 hover:text-[#007AFF] p-2 text-xs tap-effect" title="編輯紀錄">
-                    <i class="fa-regular fa-pen-to-square"></i>
-                  </button>
-                  <button onclick="deleteRecord('${id}')" class="text-gray-300 hover:text-red-500 p-2 text-xs tap-effect" title="刪除紀錄">
-                    <i class="fa-regular fa-trash-can"></i>
-                  </button>
+                  <button onclick="editRecord('${id}')" class="text-gray-400 hover:text-indigo-600 p-1.5 text-xs tap-effect"><i class="fa-regular fa-pen-to-square"></i></button>
+                  <button onclick="deleteRecord('${id}')" class="text-gray-300 hover:text-red-500 p-1.5 text-xs tap-effect"><i class="fa-regular fa-trash-can"></i></button>
                 </div>
               </div>
             `;
@@ -453,7 +563,7 @@
         const remainingCoins = INITIAL_FLOAT - totalCashTaken + totalCoinsAdded;
 
         document.getElementById('currentCoins').innerText = `$ ${remainingCoins.toLocaleString()}`;
-        document.getElementById('coinCount').innerText = `約 ${(remainingCoins / 10).toLocaleString()} 枚 10元`;
+        document.getElementById('coinCount').innerText = `約 ${(remainingCoins / 10).toLocaleString()} 枚`;
         document.getElementById('totalCashTaken').innerText = `$ ${totalCashTaken.toLocaleString()}`;
         document.getElementById('totalCoinsAdded').innerText = `補幣累計: $${totalCoinsAdded.toLocaleString()}`;
 
@@ -468,59 +578,45 @@
 
       } catch (error) {
         console.error("讀取失敗:", error);
-        historyList.innerHTML = '<div class="p-6 text-center text-xs text-red-500">載入失敗，請確認 Firestore 權限規則設定！</div>';
+        historyList.innerHTML = '<div class="p-4 text-center text-xs text-red-500">載入失敗！</div>';
       }
     }
 
-    // 計算每日硬幣消耗量的圖表邏輯
     window.renderChart = function() {
       const selectedMonth = document.getElementById('chartMonthSelect').value; 
       if (!selectedMonth) return;
 
-      // 拷貝一份並由舊到新排序
       let sortedAll = [...globalRecordsList].sort((a, b) => a.date.localeCompare(b.date));
 
       let monthTotalCash = 0;
       let monthTotalCoins = 0;
-
-      // 依日期整理
       let dailyMap = {};
+
       sortedAll.forEach(item => {
         const d = item.date;
         if (!dailyMap[d]) {
-          dailyMap[d] = { cash: 0, coins: 0, details: [] };
+          dailyMap[d] = { cash: 0, coins: 0 };
         }
         const cash = Number(item.cashTaken || 0);
         const coins = Number(item.coinsAdded || 0);
         dailyMap[d].cash += cash;
         dailyMap[d].coins += coins;
-        dailyMap[d].details.push(item);
       });
 
-      // 計算從基準日 (9/4) 開始每天的硬幣餘額與每日消耗量
-      let runningCoins = INITIAL_FLOAT;
       let currentDateObj = new Date(BASE_DATE);
       let todayObj = new Date(todayStr);
+      let dailyConsumption = {};
 
-      let dailyConsumption = {}; // 紀錄每一天玩家用掉的幣量
-
-      // 迴圈從 9/4 跑到今天
       while (currentDateObj <= todayObj) {
         let dStr = currentDateObj.toISOString().split('T')[0];
-        
         let dayCash = dailyMap[dStr] ? dailyMap[dStr].cash : 0;
         let dayCoins = dailyMap[dStr] ? dailyMap[dStr].coins : 0;
-
-        // 當天結束時的剩餘硬幣 = 昨天結餘 + 當天補幣 - 當天拿走鈔票
-        // (因為拿走鈔票通常等於當天換出的硬幣金額，或者是直接以硬幣減少量來算)
-        // 這裡以「拿走鈔票金額 = 當天玩家換走的硬幣價值」來計算實際消耗量
         let consumed = dayCash; 
 
         if (dStr.startsWith(selectedMonth)) {
           dailyConsumption[dStr] = {
             consumed: consumed,
-            coinsAdded: dayCoins,
-            cashTaken: dayCash
+            coinsAdded: dayCoins
           };
           monthTotalCash += dayCash;
           monthTotalCoins += dayCoins;
@@ -529,7 +625,6 @@
         currentDateObj.setDate(currentDateObj.getDate() + 1);
       }
 
-      // 計算平均幾天補一次幣
       const uniqueRefillDays = Object.keys(dailyMap).filter(d => d.startsWith(selectedMonth) && dailyMap[d].coins > 0);
       let avgDaysText = "無資料";
       if (uniqueRefillDays.length > 1) {
@@ -550,7 +645,7 @@
       const chartDates = Object.keys(dailyConsumption).sort();
       if (chartDates.length === 0) {
         container.innerHTML = '<div class="w-full text-center text-xs text-gray-400 self-center">該月份尚無資料</div>';
-        detailList.innerHTML = '<div class="p-4 text-center text-xs text-gray-400">尚無明細資料</div>';
+        detailList.innerHTML = '<div class="p-3 text-center text-xs text-gray-400">尚無明細資料</div>';
         return;
       }
 
@@ -564,25 +659,25 @@
 
       chartDates.forEach(d => {
         const data = dailyConsumption[d];
-        const height = Math.round((data.consumed / maxVal) * 120);
+        const height = Math.round((data.consumed / maxVal) * 110);
         const dayLabel = d.substring(8); 
 
         barsHtml += `
-          <div class="flex flex-col items-center h-full justify-end flex-1 min-w-[32px] group">
-            <div class="flex items-end gap-1 w-full justify-center h-[130px]">
-              <div class="w-4 bg-amber-500 rounded-t transition-all duration-300" style="height: ${height}px;" title="消耗: $${data.consumed}"></div>
+          <div class="flex flex-col items-center h-full justify-end flex-1 min-w-[28px] group">
+            <div class="flex items-end justify-center h-[110px]">
+              <div class="w-3.5 bg-amber-500 rounded-t-md transition-all duration-300" style="height: ${height}px;" title="消耗: $${data.consumed}"></div>
             </div>
-            <div class="text-[10px] text-gray-500 font-medium mt-1">${dayLabel}日</div>
+            <div class="text-[9px] text-gray-500 font-bold mt-1">${dayLabel}日</div>
           </div>
         `;
 
         detailHtml += `
-          <div class="p-3.5 flex items-center justify-between">
+          <div class="p-3 flex items-center justify-between">
             <div>
-              <div class="text-sm font-semibold text-gray-900">${d}</div>
-              <div class="text-xs text-gray-400 mt-0.5 flex gap-3">
-                <span class="text-amber-600 font-medium">當日消耗幣量: $${data.consumed.toLocaleString()}</span>
-                ${data.coinsAdded > 0 ? `<span class="text-[#007AFF] font-medium">補幣: +$${data.coinsAdded.toLocaleString()}</span>` : ''}
+              <div class="text-xs font-bold text-gray-900">${d}</div>
+              <div class="text-[11px] text-gray-500 mt-0.5 flex gap-3 font-semibold">
+                <span class="text-amber-600">消耗幣量: $${data.consumed.toLocaleString()}</span>
+                ${data.coinsAdded > 0 ? `<span class="text-blue-600">補幣: +$${data.coinsAdded.toLocaleString()}</span>` : ''}
               </div>
             </div>
           </div>
@@ -601,40 +696,52 @@
       document.getElementById('editingId').value = id;
       
       const radios = document.querySelectorAll('input[name="operator"]');
-      radios.forEach(r => {
-        if (r.value === data.operator) r.checked = true;
-      });
+      radios.forEach(r => { if (r.value === data.operator) r.checked = true; });
 
       const txTypeRadios = document.querySelectorAll('input[name="txType"]');
       const currentTxType = data.txType || 'normal';
-      txTypeRadios.forEach(r => {
-        if (r.value === currentTxType) r.checked = true;
-      });
+      txTypeRadios.forEach(r => { if (r.value === currentTxType) r.checked = true; });
 
       document.getElementById('recordDate').value = data.date || '';
       document.getElementById('recordTime').value = data.time || '';
-      document.getElementById('cashTaken').value = data.cashTaken !== undefined && data.cashTaken !== 0 ? data.cashTaken : '';
-      document.getElementById('coinsAdded').value = data.coinsAdded !== undefined && data.coinsAdded !== 0 ? data.coinsAdded : '';
+      
+      const cash = data.cashTaken || 0;
+      document.getElementById('cashTaken').value = cash > 0 ? cash : "";
+      const cashDisp = document.getElementById('cashTakenDisplay');
+      cashDisp.innerText = `$ ${cash.toLocaleString()}`;
+      cashDisp.className = cash > 0 ? "text-lg font-black text-emerald-600 mt-1 truncate" : "text-lg font-black text-gray-900 mt-1 truncate";
+
+      const coins = data.coinsAdded || 0;
+      document.getElementById('coinsAdded').value = coins > 0 ? coins : "";
+      const coinsDisp = document.getElementById('coinsAddedDisplay');
+      coinsDisp.innerText = `$ ${coins.toLocaleString()}`;
+      coinsDisp.className = coins > 0 ? "text-lg font-black text-blue-600 mt-1 truncate" : "text-lg font-black text-gray-900 mt-1 truncate";
+
       document.getElementById('notes').value = data.notes || '';
 
-      document.getElementById('formTitle').innerText = '編輯抄表紀錄';
-      document.getElementById('formTitle').classList.add('text-[#007AFF]');
+      document.getElementById('formTitle').innerText = '編輯紀錄';
       document.getElementById('cancelEditBtn').classList.remove('hidden');
       document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-pen"></i> 確認修改儲存';
-      document.getElementById('submitBtn').classList.replace('bg-[#007AFF]', 'bg-[#34C759]');
+      document.getElementById('submitBtn').classList.replace('bg-indigo-600', 'bg-emerald-600');
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.cancelEdit = function() {
       document.getElementById('editingId').value = '';
-      document.getElementById('formTitle').innerText = '每日抄表與補幣';
-      document.getElementById('formTitle').classList.remove('text-[#007AFF]');
+      document.getElementById('formTitle').innerText = '機台巡檢與收支登記';
       document.getElementById('cancelEditBtn').classList.add('hidden');
-      document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check"></i> 儲存今日紀錄';
-      document.getElementById('submitBtn').classList.replace('bg-[#34C759]', 'bg-[#007AFF]');
+      document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-circle-check text-sm"></i> 儲存今日登記紀錄';
+      document.getElementById('submitBtn').classList.replace('bg-emerald-600', 'bg-indigo-600');
 
       document.getElementById('recordForm').reset();
+      document.getElementById('cashTaken').value = "";
+      document.getElementById('cashTakenDisplay').innerText = "$ 0";
+      document.getElementById('cashTakenDisplay').className = "text-lg font-black text-emerald-600 mt-1 truncate";
+      document.getElementById('coinsAdded').value = "";
+      document.getElementById('coinsAddedDisplay').innerText = "$ 0";
+      document.getElementById('coinsAddedDisplay').className = "text-lg font-black text-blue-600 mt-1 truncate";
+
       const freshNow = new Date();
       document.getElementById('recordDate').value = freshNow.toISOString().split('T')[0];
       document.getElementById('recordTime').value = freshNow.toTimeString().substring(0, 5);
@@ -658,11 +765,7 @@
       try {
         for (let id of unSettledRecords) {
           const docRef = doc(db, COLLECTION_NAME, id);
-          await updateDoc(docRef, { 
-            isSettled: true,
-            settleDate: settleDate,
-            settleTime: settleTime
-          });
+          await updateDoc(docRef, { isSettled: true, settleDate, settleTime });
         }
         closeSettleModal();
         fetchData();
@@ -680,12 +783,8 @@
       const date = document.getElementById('recordDate').value;
       const time = document.getElementById('recordTime').value;
       
-      const cashTakenVal = document.getElementById('cashTaken').value;
-      const cashTaken = cashTakenVal === "" ? 0 : Number(cashTakenVal);
-
-      const coinsAddedVal = document.getElementById('coinsAdded').value;
-      const coinsAdded = coinsAddedVal === "" ? 0 : Number(coinsAddedVal);
-      
+      const cashTaken = Number(document.getElementById('cashTaken').value) || 0;
+      const coinsAdded = Number(document.getElementById('coinsAdded').value) || 0;
       const notes = document.getElementById('notes').value.trim();
 
       try {
@@ -693,33 +792,16 @@
 
         if (editingId) {
           const docRef = doc(db, COLLECTION_NAME, editingId);
-          await updateDoc(docRef, {
-            operator,
-            txType,
-            date,
-            time,
-            cashTaken,
-            coinsAdded,
-            notes,
-            isSettled
-          });
-
+          await updateDoc(docRef, { operator, txType, date, time, cashTaken, coinsAdded, notes, isSettled });
           cancelEdit();
         } else {
           await addDoc(collection(db, COLLECTION_NAME), {
-            operator,
-            txType,
-            date,
-            time,
-            cashTaken,
-            coinsAdded,
-            notes,
-            isSettled,
-            createdAt: serverTimestamp()
+            operator, txType, date, time, cashTaken, coinsAdded, notes, isSettled, createdAt: serverTimestamp()
           });
-
           document.getElementById('cashTaken').value = '';
+          document.getElementById('cashTakenDisplay').innerText = '$ 0';
           document.getElementById('coinsAdded').value = '';
+          document.getElementById('coinsAddedDisplay').innerText = '$ 0';
           document.getElementById('notes').value = '';
         }
         
@@ -734,7 +816,7 @@
     });
 
     window.deleteRecord = async function(id) {
-      if (confirm("確定要刪除這筆抄表紀錄嗎？")) {
+      if (confirm("確定要刪除這筆紀錄嗎？")) {
         try {
           await deleteDoc(doc(db, COLLECTION_NAME, id));
           fetchData();
