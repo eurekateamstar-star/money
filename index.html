@@ -9,9 +9,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome 圖示庫 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- 可愛圓體字型 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
   <style>
     /* 鎖定網頁整體根部，防止整個畫面亂飄或左右晃動 */
     html, body {
@@ -31,11 +28,6 @@
       flex-direction: column;
       justify-content: space-between;
       touch-action: none; /* 禁止整個頁面被手勢拖動，避免標題跟著位移出現空白 */
-    }
-    /* 可愛圓體字，用在標題與大數字上 */
-    .font-cute {
-      font-family: 'ZCOOL KuaiLe', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-weight: 400;
     }
     /* 只有主內容區可以垂直滾動，其餘區域（含標題列）完全不動 */
     main {
@@ -69,7 +61,7 @@
         <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-400 text-white flex items-center justify-center text-xs shadow-md shadow-pink-400/30 shrink-0">
           🎮
         </div>
-        <h1 class="font-cute text-lg text-pink-500 tracking-tight truncate" id="headerTitle">兌幣機管理系統</h1>
+        <h1 class="font-bold text-base text-pink-500 tracking-tight truncate" id="headerTitle">兌幣機管理系統</h1>
       </div>
       <button onclick="fetchData()" class="w-8 h-8 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center tap-effect text-xs shadow-xs shrink-0">
         <i class="fa-solid fa-arrows-rotate"></i>
@@ -100,12 +92,12 @@
       <div id="manageSwipeArea" class="flex-1 min-h-0 flex flex-col">
 
         <!-- ---- 子頁：總覽 ---- -->
-        <div id="manageOverviewPanel" class="h-full overflow-y-auto no-scrollbar overscroll-contain flex flex-col justify-center gap-5 pb-2">
+        <div id="manageOverviewPanel" class="h-full overflow-y-auto no-scrollbar overscroll-contain flex flex-col justify-start gap-3.5 pb-2 pt-1">
 
           <!-- 幣量低於 10,000 警告橫幅 -->
-          <div id="coinWarningAlert" class="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 flex items-center gap-3 hidden animate-pulse shadow-sm">
-            <div class="w-9 h-9 rounded-xl bg-rose-500 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-md shadow-rose-500/30">
-              <i class="fa-solid fa-triangle-exclamation text-base"></i>
+          <div id="coinWarningAlert" class="bg-rose-50 border border-rose-200 rounded-2xl p-3 flex items-center gap-3 hidden animate-pulse shadow-sm shrink-0">
+            <div class="w-8 h-8 rounded-xl bg-rose-500 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-md shadow-rose-500/30">
+              <i class="fa-solid fa-triangle-exclamation text-sm"></i>
             </div>
             <div>
               <div class="text-xs font-black text-rose-900">機台硬幣嚴重不足警告！</div>
@@ -113,50 +105,68 @@
             </div>
           </div>
 
-          <!-- 儀表板卡片（可愛馬卡龍配色） -->
-          <div class="grid grid-cols-2 gap-3">
-            <!-- 剩餘 10 元硬幣 -->
-            <div class="bg-gradient-to-br from-sky-50 to-blue-100 rounded-3xl p-4 shadow-sm border border-white flex flex-col justify-between relative overflow-hidden">
-              <div class="absolute -top-3 -right-3 text-3xl opacity-40 select-none pointer-events-none">🪙</div>
+          <!-- 1. 剩餘硬幣專屬大卡片 (置於上方，靠上方對齊) -->
+          <div class="bg-gradient-to-br from-sky-50 to-blue-100 rounded-3xl p-4 shadow-sm border border-white flex flex-col justify-between relative overflow-hidden shrink-0">
+            <div class="absolute -top-3 -right-3 text-4xl opacity-30 select-none pointer-events-none">🪙</div>
+            <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full bg-white/80 text-sky-500 flex items-center justify-center text-xs shrink-0 shadow-sm">
+                <div class="w-7 h-7 rounded-full bg-white/80 text-sky-500 flex items-center justify-center text-xs shrink-0 shadow-sm">
                   <i class="fa-solid fa-coins"></i>
                 </div>
-                <span class="text-xs font-bold text-sky-700/70 truncate">剩餘硬幣</span>
+                <span class="text-xs font-bold text-sky-800">剩餘硬幣總額</span>
+              </div>
+              <span class="text-[10px] text-white bg-sky-400 py-1 px-2.5 rounded-full font-extrabold shadow-sm">初始 $25,000 (9/4)</span>
+            </div>
+            <div class="my-2.5 flex items-baseline justify-between">
+              <div class="text-3xl font-black text-sky-700 tracking-tight" id="currentCoins">$ 25,000</div>
+              <div class="text-xs text-sky-600 font-bold" id="coinCount">約 2,500 枚</div>
+            </div>
+          </div>
+
+          <!-- 2. 下方並排：當日消耗幣量 & 歷史總營收 -->
+          <div class="grid grid-cols-2 gap-3 shrink-0">
+            <!-- 當日消耗幣量 -->
+            <div class="bg-gradient-to-br from-amber-50 to-orange-100 rounded-3xl p-4 shadow-sm border border-white flex flex-col justify-between relative overflow-hidden">
+              <div class="absolute -top-3 -right-3 text-3xl opacity-30 select-none pointer-events-none">📊</div>
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full bg-white/80 text-amber-500 flex items-center justify-center text-xs shrink-0 shadow-sm">
+                  <i class="fa-solid fa-fire-flame-curved"></i>
+                </div>
+                <span class="text-xs font-bold text-amber-800/80 truncate">今日消耗幣量</span>
               </div>
               <div class="my-2">
-                <div class="font-cute text-2xl text-sky-700 tracking-tight truncate" id="currentCoins">$ 25,000</div>
-                <div class="text-[11px] text-sky-600/70 font-bold mt-0.5 truncate" id="coinCount">約 2,500 枚</div>
+                <div class="text-xl font-black text-amber-700 tracking-tight truncate" id="todayConsumedCoins">$ 0</div>
+                <div class="text-[10px] text-amber-600/80 font-bold mt-0.5 truncate" id="todayConsumedCount">約 0 枚</div>
               </div>
-              <span class="text-[10px] text-white bg-sky-400 py-1 px-2 rounded-full inline-block self-start font-extrabold shadow-sm">初始 $25,000 (9/4)</span>
+              <span class="text-[9px] text-white bg-amber-400 py-0.5 px-2 rounded-full inline-block self-start font-extrabold shadow-sm">今日機台咬幣</span>
             </div>
 
-            <!-- 累計取走鈔票 -->
+            <!-- 歷史總營收 -->
             <div class="bg-gradient-to-br from-emerald-50 to-teal-100 rounded-3xl p-4 shadow-sm border border-white flex flex-col justify-between relative overflow-hidden">
-              <div class="absolute -top-3 -right-3 text-3xl opacity-40 select-none pointer-events-none">💰</div>
+              <div class="absolute -top-3 -right-3 text-3xl opacity-30 select-none pointer-events-none">💰</div>
               <div class="flex items-center gap-2">
                 <div class="w-6 h-6 rounded-full bg-white/80 text-emerald-500 flex items-center justify-center text-xs shrink-0 shadow-sm">
                   <i class="fa-solid fa-money-bill-wave"></i>
                 </div>
-                <span class="text-xs font-bold text-emerald-700/70 truncate">歷史總營收</span>
+                <span class="text-xs font-bold text-emerald-800/80 truncate">歷史總營收</span>
               </div>
               <div class="my-2">
-                <div class="font-cute text-2xl text-emerald-700 tracking-tight truncate" id="totalCashTaken">$ 0</div>
-                <div class="text-[11px] text-emerald-600/70 font-bold mt-0.5 truncate" id="totalCoinsAdded">補幣累計: $0</div>
+                <div class="text-xl font-black text-emerald-700 tracking-tight truncate" id="totalCashTaken">$ 0</div>
+                <div class="text-[10px] text-emerald-600/80 font-bold mt-0.5 truncate" id="totalCoinsAdded">補幣累計: $0</div>
               </div>
-              <span class="text-[10px] text-white bg-emerald-400 py-1 px-2 rounded-full inline-block self-start font-extrabold shadow-sm">已取走鈔票</span>
+              <span class="text-[9px] text-white bg-emerald-400 py-0.5 px-2 rounded-full inline-block self-start font-extrabold shadow-sm">已取走鈔票</span>
             </div>
           </div>
 
           <!-- 柏昇交接給奕昕的欠款狀態卡片 -->
-          <div id="debtCard" class="bg-gradient-to-r from-orange-300 to-pink-300 text-white rounded-3xl p-4 flex items-center justify-between shadow-md shadow-orange-300/30 hidden">
+          <div id="debtCard" class="bg-gradient-to-r from-orange-300 to-pink-300 text-white rounded-3xl p-4 flex items-center justify-between shadow-md shadow-orange-300/30 hidden shrink-0">
             <div class="flex items-center gap-3 min-w-0 pr-2">
               <div class="w-10 h-10 rounded-2xl bg-white/25 ios-blur flex items-center justify-center text-base shrink-0">
                 🐷
               </div>
               <div class="min-w-0">
                 <div class="text-xs font-medium text-orange-50 truncate">柏昇未交接現金（待收回）</div>
-                <div class="font-cute text-xl tracking-tight truncate" id="pendingDebtAmount">$ 0</div>
+                <div class="text-lg font-black tracking-tight truncate" id="pendingDebtAmount">$ 0</div>
               </div>
             </div>
             <button onclick="openSettleModal()" class="bg-white text-orange-500 text-xs font-black px-3.5 py-2.5 rounded-full tap-effect shadow-sm shrink-0">
@@ -165,8 +175,8 @@
           </div>
 
           <!-- 快速前往登記 -->
-          <button onclick="switchManageSub('form')" class="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-3.5 rounded-full font-cute text-base shadow-lg shadow-pink-400/30 tap-effect flex items-center justify-center gap-2">
-            <i class="fa-solid fa-plus text-base"></i>
+          <button onclick="switchManageSub('form')" class="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-3.5 rounded-full font-bold text-sm shadow-lg shadow-pink-400/30 tap-effect flex items-center justify-center gap-2 shrink-0">
+            <i class="fa-solid fa-plus text-sm"></i>
             新增今日登記
           </button>
         </div>
@@ -251,8 +261,8 @@
               </div>
 
               <!-- 提交按鈕 -->
-              <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-3.5 rounded-full font-cute text-base shadow-lg shadow-pink-400/30 tap-effect flex items-center justify-center gap-2">
-                <i class="fa-solid fa-circle-check text-base"></i>
+              <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-3.5 rounded-full font-bold text-sm shadow-lg shadow-pink-400/30 tap-effect flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-check text-sm"></i>
                 儲存今日登記紀錄
               </button>
             </form>
@@ -416,7 +426,7 @@
         <button type="button" onclick="calcBackspace()" class="bg-slate-100 hover:bg-slate-200 py-3.5 rounded-2xl tap-effect text-sm"><i class="fa-solid fa-delete-left"></i></button>
       </div>
 
-      <button type="button" onclick="confirmCalculator()" class="w-full bg-gradient-to-r from-pink-400 to-rose-400 text-white py-3.5 rounded-full font-cute text-base shadow-md shadow-pink-400/30 tap-effect">
+      <button type="button" onclick="confirmCalculator()" class="w-full bg-gradient-to-r from-pink-400 to-rose-400 text-white py-3.5 rounded-full font-bold text-sm shadow-md shadow-pink-400/30 tap-effect">
         確認套用金額
       </button>
 
@@ -576,12 +586,10 @@
         tracking = false;
         const dx = e.changedTouches[0].clientX - startX;
         const dy = e.changedTouches[0].clientY - startY;
-        // 需要明顯的水平滑動，且不能是垂直捲動誤觸
         if (Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
 
         const idx = order.indexOf(getCurrent());
         if (idx === -1) return;
-        // 向左滑 -> 下一頁；向右滑 -> 上一頁
         let nextIdx = dx < 0 ? idx + 1 : idx - 1;
         nextIdx = Math.max(0, Math.min(order.length - 1, nextIdx));
         if (nextIdx !== idx) switchFn(order[nextIdx]);
@@ -746,6 +754,36 @@
         document.getElementById('totalCashTaken').innerText = `$ ${totalCashTaken.toLocaleString()}`;
         document.getElementById('totalCoinsAdded').innerText = `補幣累計: $${totalCoinsAdded.toLocaleString()}`;
 
+        // 計算今日消耗幣量
+        let sortedAll = [...globalRecordsList].sort((a, b) => a.date.localeCompare(b.date));
+        let dailyMap = {};
+        sortedAll.forEach(item => {
+          const d = item.date;
+          if (!dailyMap[d]) dailyMap[d] = { cash: 0, coins: 0 };
+          dailyMap[d].cash += Number(item.cashTaken || 0);
+          dailyMap[d].coins += Number(item.coinsAdded || 0);
+        });
+
+        let todayConsumed = 0;
+        let currentDateObj = new Date(BASE_DATE);
+        let todayObj = new Date(todayStr);
+        let runningCoins = INITIAL_FLOAT;
+
+        while (currentDateObj <= todayObj) {
+          let dStr = currentDateObj.toISOString().split('T')[0];
+          let dayCash = dailyMap[dStr] ? dailyMap[dStr].cash : 0;
+          let dayCoins = dailyMap[dStr] ? dailyMap[dStr].coins : 0;
+          runningCoins = runningCoins - dayCash + dayCoins;
+
+          if (dStr === todayStr) {
+            todayConsumed = dayCash;
+          }
+          currentDateObj.setDate(currentDateObj.getDate() + 1);
+        }
+
+        document.getElementById('todayConsumedCoins').innerText = `$ ${todayConsumed.toLocaleString()}`;
+        document.getElementById('todayConsumedCount').innerText = `約 ${(todayConsumed / 10).toLocaleString()} 枚`;
+
         const warningAlert = document.getElementById('coinWarningAlert');
         if (remainingCoins < 10000) {
           warningAlert.classList.remove('hidden');
@@ -824,14 +862,13 @@
 
       const [yearStr, monthStr] = selectedMonth.split('-');
       const daysInMonth = new Date(Number(yearStr), Number(monthStr), 0).getDate();
-      const firstWeekday = new Date(Number(yearStr), Number(monthStr) - 1, 1).getDay(); // 0=日 6=六
+      const firstWeekday = new Date(Number(yearStr), Number(monthStr) - 1, 1).getDay();
 
       let maxVal = 1000;
       Object.values(dailyConsumption).forEach(v => {
         if (v.consumed > maxVal) maxVal = v.consumed;
       });
 
-      // 判斷框框顏色深淺（依消耗金額比例）
       function boxColorClass(consumed) {
         if (consumed <= 0) return 'bg-slate-50 border-slate-100 text-slate-300';
         const ratio = consumed / maxVal;
@@ -842,7 +879,6 @@
 
       let gridHtml = '';
 
-      // 月初前面補空白框，讓日期對齊星期
       for (let i = 0; i < firstWeekday; i++) {
         gridHtml += `<div></div>`;
       }
@@ -857,7 +893,6 @@
         const data = dailyConsumption[dStr];
 
         if (!inRange || !data) {
-          // 尚未啟用或尚未到達的日期：顯示淡化框框
           gridHtml += `
             <div class="aspect-square rounded-xl border border-dashed border-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-200">
               ${day}
@@ -948,7 +983,7 @@
       document.getElementById('editingId').value = '';
       document.getElementById('formTitle').innerText = '機台巡檢與收支登記';
       document.getElementById('cancelEditBtn').classList.add('hidden');
-      document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-circle-check text-base"></i> 儲存今日登記紀錄';
+      document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-circle-check text-sm"></i> 儲存今日登記紀錄';
       document.getElementById('submitBtn').classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
       document.getElementById('submitBtn').classList.add('from-pink-400', 'to-rose-400', 'hover:from-pink-500', 'hover:to-rose-500');
 
