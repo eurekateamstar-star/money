@@ -158,11 +158,11 @@
             </div>
           </div>
 
-          <!-- 柏昇交接給奕昕的欠款狀態卡片 -->
+          <!-- 柏昇交接給奕昕的欠款狀態卡片 (已改為小狗 🐶) -->
           <div id="debtCard" class="bg-gradient-to-r from-orange-300 to-pink-300 text-white rounded-3xl p-4 flex items-center justify-between shadow-md shadow-orange-300/30 hidden shrink-0">
             <div class="flex items-center gap-3 min-w-0 pr-2">
               <div class="w-10 h-10 rounded-2xl bg-white/25 ios-blur flex items-center justify-center text-base shrink-0">
-                🐷
+                🐶
               </div>
               <div class="min-w-0">
                 <div class="text-xs font-medium text-orange-50 truncate">柏昇未交接現金（待收回）</div>
@@ -434,9 +434,9 @@
   </div>
 
 
-  <!-- 奕昕確認收回對話框 (Modal) -->
-  <div id="settleModal" class="fixed inset-0 z-50 bg-slate-900/40 ios-blur flex items-center justify-center px-4 hidden">
-    <div class="bg-white rounded-3xl max-w-xs w-full p-6 space-y-4 shadow-xl">
+  <!-- 奕昕確認收回對話框 (Modal) - 修正手機邊界溢出問題 -->
+  <div id="settleModal" class="fixed inset-0 z-50 bg-slate-900/40 ios-blur flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-xs w-[90%] mx-auto p-6 space-y-4 shadow-xl">
       <h3 class="text-base font-black text-slate-900">確認收回現金交接</h3>
       <p class="text-xs text-slate-500">請選擇奕昕實際收到款項的日期與時間：</p>
       
@@ -767,13 +767,11 @@
         let todayConsumed = 0;
         let currentDateObj = new Date(BASE_DATE);
         let todayObj = new Date(todayStr);
-        let runningCoins = INITIAL_FLOAT;
 
         while (currentDateObj <= todayObj) {
           let dStr = currentDateObj.toISOString().split('T')[0];
           let dayCash = dailyMap[dStr] ? dailyMap[dStr].cash : 0;
           let dayCoins = dailyMap[dStr] ? dailyMap[dStr].coins : 0;
-          runningCoins = runningCoins - dayCash + dayCoins;
 
           if (dStr === todayStr) {
             todayConsumed = dayCash;
@@ -1061,6 +1059,10 @@
         const freshNow = new Date();
         document.getElementById('recordDate').value = freshNow.toISOString().split('T')[0];
         document.getElementById('recordTime').value = freshNow.toTimeString().substring(0, 5);
+
+        // 儲存成功後自動跳轉回第一頁（總覽）
+        switchTab('manage');
+        switchManageSub('overview');
 
         fetchData();
       } catch (error) {
