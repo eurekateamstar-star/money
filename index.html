@@ -15,8 +15,11 @@
       overflow: hidden;
       width: 100%;
       height: 100%;
+      height: 100dvh; /* 修正手機瀏覽器網址列縮放造成的高度跳動 */
       position: fixed;
+      inset: 0;
       background-color: #F8FAFC;
+      overscroll-behavior: none; /* 防止 iOS/Android 整頁橡皮筋回彈 */
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -24,6 +27,13 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      touch-action: none; /* 禁止整個頁面被手勢拖動，避免標題跟著位移出現空白 */
+    }
+    /* 只有主內容區可以垂直滾動，其餘區域（含標題列）完全不動 */
+    main {
+      touch-action: pan-y;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
     .ios-blur {
       backdrop-filter: blur(20px);
@@ -44,8 +54,8 @@
 </head>
 <body class="text-slate-800 select-none">
 
-  <!-- 頂部精簡導航列 (固定不動) -->
-  <header class="z-40 bg-white/90 ios-blur border-b border-slate-100 pt-safe shadow-xs w-full shrink-0">
+  <!-- 頂部精簡導航列 (真正固定於畫面頂部，不隨內容滾動) -->
+  <header class="fixed top-0 left-0 right-0 z-40 bg-white/90 ios-blur border-b border-slate-100 pt-safe shadow-xs w-full">
     <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs shadow-md shadow-indigo-500/20 shrink-0">
@@ -59,219 +69,288 @@
     </div>
   </header>
 
-  <!-- 主內容區：改為內部獨立卷軸滾動，外框不跑版 -->
-  <main class="max-w-md mx-auto w-full px-4 py-4 space-y-4 overflow-y-auto no-scrollbar flex-1 pb-20">
+  <!-- 主內容區：整頁不再上下滑動，改用「點選子頁籤」切換內容，每個子頁籤都固定在同一畫面高度內 -->
+  <main id="mainScroll" class="max-w-md mx-auto w-full px-4 flex-1 flex flex-col overflow-hidden min-h-0" style="padding-top:76px; padding-bottom:70px;">
 
     <!-- ==================== 分頁一：管理登記頁面 ==================== -->
-    <div id="tabManageContent" class="space-y-4">
-      
-      <!-- 幣量低於 10,000 警告橫幅 -->
-      <div id="coinWarningAlert" class="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 flex items-center gap-3 hidden animate-pulse shadow-sm">
-        <div class="w-9 h-9 rounded-xl bg-rose-500 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-md shadow-rose-500/30">
-          <i class="fa-solid fa-triangle-exclamation text-base"></i>
-        </div>
-        <div>
-          <div class="text-xs font-black text-rose-900">機台硬幣嚴重不足警告！</div>
-          <div class="text-[11px] text-rose-700 font-medium mt-0.5">剩餘硬幣低於 $10,000，請盡快安排補幣！</div>
-        </div>
-      </div>
+    <div id="tabManageContent" class="flex-1 min-h-0 flex flex-col gap-3">
 
-      <!-- 儀表板卡片 -->
-      <div class="grid grid-cols-2 gap-3">
-        <!-- 剩餘 10 元硬幣 -->
-        <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none"></div>
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs shrink-0">
-              <i class="fa-solid fa-coins"></i>
-            </div>
-            <span class="text-xs font-bold text-slate-400 truncate">剩餘硬幣</span>
-          </div>
-          <div class="my-2">
-            <div class="text-2xl font-black text-slate-900 tracking-tight truncate" id="currentCoins">$ 25,000</div>
-            <div class="text-[11px] text-slate-400 font-bold mt-0.5 truncate" id="coinCount">約 2,500 枚</div>
-          </div>
-          <span class="text-[10px] text-blue-600 bg-blue-50/80 py-1 px-2 rounded-lg inline-block self-start font-extrabold">初始 $25,000 (9/4)</span>
-        </div>
-
-        <!-- 累計取走鈔票 -->
-        <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none"></div>
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs shrink-0">
-              <i class="fa-solid fa-money-bill-wave"></i>
-            </div>
-            <span class="text-xs font-bold text-slate-400 truncate">歷史總營收</span>
-          </div>
-          <div class="my-2">
-            <div class="text-2xl font-black text-emerald-600 tracking-tight truncate" id="totalCashTaken">$ 0</div>
-            <div class="text-[11px] text-slate-400 font-bold mt-0.5 truncate" id="totalCoinsAdded">補幣累計: $0</div>
-          </div>
-          <span class="text-[10px] text-emerald-700 bg-emerald-50/80 py-1 px-2 rounded-lg inline-block self-start font-extrabold">已取走鈔票</span>
-        </div>
-      </div>
-
-      <!-- 柏昇交接給奕昕的欠款狀態卡片 -->
-      <div id="debtCard" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-3xl p-4 flex items-center justify-between shadow-md shadow-amber-500/20 hidden">
-        <div class="flex items-center gap-3 min-w-0 pr-2">
-          <div class="w-10 h-10 rounded-2xl bg-white/20 ios-blur flex items-center justify-center text-base font-bold shrink-0">
-            <i class="fa-solid fa-hand-holding-dollar"></i>
-          </div>
-          <div class="min-w-0">
-            <div class="text-xs font-medium text-amber-100 truncate">柏昇未交接現金（待收回）</div>
-            <div class="text-xl font-black tracking-tight truncate" id="pendingDebtAmount">$ 0</div>
-          </div>
-        </div>
-        <button onclick="openSettleModal()" class="bg-white text-amber-900 text-xs font-black px-3.5 py-2.5 rounded-2xl tap-effect shadow-sm shrink-0">
-          奕昕收回
+      <!-- 子頁籤：總覽 / 登記 / 紀錄 -->
+      <div class="grid grid-cols-3 gap-1.5 bg-slate-100 rounded-2xl p-1 shrink-0">
+        <button onclick="switchManageSub('overview')" id="manageSubOverviewBtn" class="py-2 rounded-xl text-xs font-black bg-white text-indigo-600 shadow-sm tap-effect transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-gauge-high text-[11px]"></i>總覽
+        </button>
+        <button onclick="switchManageSub('form')" id="manageSubFormBtn" class="py-2 rounded-xl text-xs font-bold text-slate-400 tap-effect transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-pen-to-square text-[11px]"></i>登記
+        </button>
+        <button onclick="switchManageSub('history')" id="manageSubHistoryBtn" class="py-2 rounded-xl text-xs font-bold text-slate-400 tap-effect transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-clock-rotate-left text-[11px]"></i>紀錄
         </button>
       </div>
 
-      <!-- 每日清機登記表單 -->
-      <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 space-y-4">
-        
-        <!-- 標題與日期時間排在同一行 -->
-        <div class="flex justify-between items-center border-b border-slate-100 pb-3 gap-2">
-          <div class="text-sm font-black text-slate-800 flex items-center gap-2 shrink-0">
-            <i class="fa-solid fa-pen-to-square text-indigo-600"></i>
-            <span id="formTitle">機台巡檢與收支登記</span>
-          </div>
+      <!-- 內容區：三個子頁面共用同一塊空間，切換時不跳動、不需整頁滑動 -->
+      <div class="flex-1 min-h-0 flex flex-col">
 
-          <!-- 右側日期與時間整合選單 -->
-          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-xl px-2 py-1">
-            <input type="date" id="recordDate" class="text-[11px] bg-transparent outline-none text-indigo-600 font-extrabold w-22">
-            <span class="text-slate-300">|</span>
-            <input type="time" id="recordTime" class="text-[11px] bg-transparent outline-none text-slate-700 font-extrabold w-13">
-          </div>
-        </div>
+        <!-- ---- 子頁：總覽 ---- -->
+        <div id="manageOverviewPanel" class="h-full overflow-y-auto no-scrollbar overscroll-contain space-y-3 pb-2">
 
-        <button id="cancelEditBtn" onclick="cancelEdit()" class="text-xs text-rose-500 font-bold hidden tap-effect -mt-2">取消編輯</button>
-
-        <form id="recordForm" class="space-y-4">
-          <input type="hidden" id="editingId" value="">
-          
-          <!-- 處理人員 -->
-          <div class="space-y-1.5">
-            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">處理人員</label>
-            <div class="grid grid-cols-2 gap-2.5">
-              <label class="cursor-pointer text-center text-xs font-black py-3 rounded-2xl border-2 transition select-none flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-100 has-[:checked]:bg-sky-500 has-[:checked]:text-white has-[:checked]:border-sky-500 has-[:checked]:shadow-md has-[:checked]:shadow-sky-500/25">
-                <input type="radio" name="operator" value="柏昇" class="hidden" checked> 
-                <i class="fa-solid fa-user-astronaut text-sm"></i> 柏昇
-              </label>
-              <label class="cursor-pointer text-center text-xs font-black py-3 rounded-2xl border-2 transition select-none flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-100 has-[:checked]:bg-fuchsia-600 has-[:checked]:text-white has-[:checked]:border-fuchsia-600 has-[:checked]:shadow-md has-[:checked]:shadow-fuchsia-600/25">
-                <input type="radio" name="operator" value="奕昕" class="hidden"> 
-                <i class="fa-solid fa-user-ninja text-sm"></i> 奕昕
-              </label>
+          <!-- 幣量低於 10,000 警告橫幅 -->
+          <div id="coinWarningAlert" class="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 flex items-center gap-3 hidden animate-pulse shadow-sm">
+            <div class="w-9 h-9 rounded-xl bg-rose-500 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-md shadow-rose-500/30">
+              <i class="fa-solid fa-triangle-exclamation text-base"></i>
+            </div>
+            <div>
+              <div class="text-xs font-black text-rose-900">機台硬幣嚴重不足警告！</div>
+              <div class="text-[11px] text-rose-700 font-medium mt-0.5">剩餘硬幣低於 $10,000，請盡快安排補幣！</div>
             </div>
           </div>
 
-          <!-- 交易性質 -->
-          <div class="grid grid-cols-2 gap-2.5">
-            <label class="cursor-pointer text-center text-xs font-bold py-2.5 rounded-2xl border-2 transition select-none bg-slate-50 text-slate-600 border-slate-100 has-[:checked]:bg-indigo-50 has-[:checked]:text-indigo-700 has-[:checked]:border-indigo-200 has-[:checked]:font-black">
-              <input type="radio" name="txType" value="normal" class="hidden" checked> 一般交接 (需收回)
-            </label>
-            <label class="cursor-pointer text-center text-xs font-bold py-2.5 rounded-2xl border-2 transition select-none bg-slate-50 text-slate-600 border-slate-100 has-[:checked]:bg-purple-50 has-[:checked]:text-purple-700 has-[:checked]:border-purple-200 has-[:checked]:font-black">
-              <input type="radio" name="txType" value="exchange" class="hidden"> 台主換幣 (不交接)
-            </label>
-          </div>
-
-          <!-- 備註欄位 -->
-          <div class="space-y-1.5">
-            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">備註說明</label>
-            <div class="bg-slate-50 rounded-2xl px-3 py-2.5 border border-slate-100 flex items-center gap-2">
-              <i class="fa-regular fa-note-sticky text-slate-400 text-xs"></i>
-              <input type="text" id="notes" placeholder="選填備註（例如：補滿硬幣、機台保養等）" class="text-xs bg-transparent outline-none w-full text-slate-700 placeholder:text-slate-300 font-bold">
-            </div>
-          </div>
-
-          <!-- 金額輸入區 -->
+          <!-- 儀表板卡片 -->
           <div class="grid grid-cols-2 gap-3">
-            <div onclick="openCalculator('cashTaken', '拿走鈔票金額')" class="bg-emerald-50/50 hover:bg-emerald-50 border-2 border-emerald-500/20 rounded-2xl p-3.5 cursor-pointer transition shadow-xs">
-              <div class="text-[11px] text-emerald-700 font-bold flex justify-between items-center">
-                <span class="truncate">拿走鈔票 ($)</span>
-                <i class="fa-solid fa-calculator text-emerald-600"></i>
+            <!-- 剩餘 10 元硬幣 -->
+            <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden">
+              <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none"></div>
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs shrink-0">
+                  <i class="fa-solid fa-coins"></i>
+                </div>
+                <span class="text-xs font-bold text-slate-400 truncate">剩餘硬幣</span>
               </div>
-              <div class="text-xl font-black text-emerald-600 mt-1.5 truncate" id="cashTakenDisplay">$ 0</div>
-              <input type="hidden" id="cashTaken" value="">
+              <div class="my-2">
+                <div class="text-2xl font-black text-slate-900 tracking-tight truncate" id="currentCoins">$ 25,000</div>
+                <div class="text-[11px] text-slate-400 font-bold mt-0.5 truncate" id="coinCount">約 2,500 枚</div>
+              </div>
+              <span class="text-[10px] text-blue-600 bg-blue-50/80 py-1 px-2 rounded-lg inline-block self-start font-extrabold">初始 $25,000 (9/4)</span>
             </div>
 
-            <div onclick="openCalculator('coinsAdded', '補進 10元金額')" class="bg-blue-50/50 hover:bg-blue-50 border-2 border-blue-500/20 rounded-2xl p-3.5 cursor-pointer transition shadow-xs">
-              <div class="text-[11px] text-blue-700 font-bold flex justify-between items-center">
-                <span class="truncate">補進 10元 ($)</span>
-                <i class="fa-solid fa-calculator text-blue-600"></i>
+            <!-- 累計取走鈔票 -->
+            <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden">
+              <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none"></div>
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs shrink-0">
+                  <i class="fa-solid fa-money-bill-wave"></i>
+                </div>
+                <span class="text-xs font-bold text-slate-400 truncate">歷史總營收</span>
               </div>
-              <div class="text-xl font-black text-blue-600 mt-1.5 truncate" id="coinsAddedDisplay">$ 0</div>
-              <input type="hidden" id="coinsAdded" value="">
+              <div class="my-2">
+                <div class="text-2xl font-black text-emerald-600 tracking-tight truncate" id="totalCashTaken">$ 0</div>
+                <div class="text-[11px] text-slate-400 font-bold mt-0.5 truncate" id="totalCoinsAdded">補幣累計: $0</div>
+              </div>
+              <span class="text-[10px] text-emerald-700 bg-emerald-50/80 py-1 px-2 rounded-lg inline-block self-start font-extrabold">已取走鈔票</span>
             </div>
           </div>
 
-          <!-- 提交按鈕 -->
-          <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-2xl font-black text-sm shadow-lg shadow-indigo-600/25 tap-effect flex items-center justify-center gap-2">
-            <i class="fa-solid fa-circle-check text-base"></i>
-            儲存今日登記紀錄
-          </button>
-        </form>
-      </div>
+          <!-- 柏昇交接給奕昕的欠款狀態卡片 -->
+          <div id="debtCard" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-3xl p-4 flex items-center justify-between shadow-md shadow-amber-500/20 hidden">
+            <div class="flex items-center gap-3 min-w-0 pr-2">
+              <div class="w-10 h-10 rounded-2xl bg-white/20 ios-blur flex items-center justify-center text-base font-bold shrink-0">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="text-xs font-medium text-amber-100 truncate">柏昇未交接現金（待收回）</div>
+                <div class="text-xl font-black tracking-tight truncate" id="pendingDebtAmount">$ 0</div>
+              </div>
+            </div>
+            <button onclick="openSettleModal()" class="bg-white text-amber-900 text-xs font-black px-3.5 py-2.5 rounded-2xl tap-effect shadow-sm shrink-0">
+              奕昕收回
+            </button>
+          </div>
 
-      <!-- 最近紀錄列表 -->
-      <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 space-y-3">
-        <div class="text-xs font-bold text-slate-400 px-1 flex justify-between items-center">
-          <span>最近抄表紀錄</span>
-          <span class="text-[10px]">柏昇(藍) / 奕昕(粉)</span>
+          <!-- 快速前往登記 -->
+          <button onclick="switchManageSub('form')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-2xl font-black text-sm shadow-lg shadow-indigo-600/25 tap-effect flex items-center justify-center gap-2">
+            <i class="fa-solid fa-plus text-base"></i>
+            新增今日登記
+          </button>
         </div>
-        <div class="divide-y divide-slate-50 max-h-56 overflow-y-auto no-scrollbar" id="historyList">
-          <div class="p-4 text-center text-xs text-slate-400">載入中...</div>
+
+        <!-- ---- 子頁：登記表單 ---- -->
+        <div id="manageFormPanel" class="h-full overflow-y-auto no-scrollbar overscroll-contain hidden pb-2">
+          <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 space-y-4">
+
+            <!-- 標題與日期時間排在同一行 -->
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3 gap-2">
+              <div class="text-sm font-black text-slate-800 flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-pen-to-square text-indigo-600"></i>
+                <span id="formTitle">機台巡檢與收支登記</span>
+              </div>
+
+              <!-- 右側日期與時間整合選單 -->
+              <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-xl px-2 py-1">
+                <input type="date" id="recordDate" class="text-[11px] bg-transparent outline-none text-indigo-600 font-extrabold w-22">
+                <span class="text-slate-300">|</span>
+                <input type="time" id="recordTime" class="text-[11px] bg-transparent outline-none text-slate-700 font-extrabold w-13">
+              </div>
+            </div>
+
+            <button id="cancelEditBtn" onclick="cancelEdit()" class="text-xs text-rose-500 font-bold hidden tap-effect -mt-2">取消編輯</button>
+
+            <form id="recordForm" class="space-y-4">
+              <input type="hidden" id="editingId" value="">
+
+              <!-- 處理人員 -->
+              <div class="space-y-1.5">
+                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">處理人員</label>
+                <div class="grid grid-cols-2 gap-2.5">
+                  <label class="cursor-pointer text-center text-xs font-black py-3 rounded-2xl border-2 transition select-none flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-100 has-[:checked]:bg-sky-500 has-[:checked]:text-white has-[:checked]:border-sky-500 has-[:checked]:shadow-md has-[:checked]:shadow-sky-500/25">
+                    <input type="radio" name="operator" value="柏昇" class="hidden" checked> 
+                    <i class="fa-solid fa-user-astronaut text-sm"></i> 柏昇
+                  </label>
+                  <label class="cursor-pointer text-center text-xs font-black py-3 rounded-2xl border-2 transition select-none flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-100 has-[:checked]:bg-fuchsia-600 has-[:checked]:text-white has-[:checked]:border-fuchsia-600 has-[:checked]:shadow-md has-[:checked]:shadow-fuchsia-600/25">
+                    <input type="radio" name="operator" value="奕昕" class="hidden"> 
+                    <i class="fa-solid fa-user-ninja text-sm"></i> 奕昕
+                  </label>
+                </div>
+              </div>
+
+              <!-- 交易性質 -->
+              <div class="grid grid-cols-2 gap-2.5">
+                <label class="cursor-pointer text-center text-xs font-bold py-2.5 rounded-2xl border-2 transition select-none bg-slate-50 text-slate-600 border-slate-100 has-[:checked]:bg-indigo-50 has-[:checked]:text-indigo-700 has-[:checked]:border-indigo-200 has-[:checked]:font-black">
+                  <input type="radio" name="txType" value="normal" class="hidden" checked> 一般交接 (需收回)
+                </label>
+                <label class="cursor-pointer text-center text-xs font-bold py-2.5 rounded-2xl border-2 transition select-none bg-slate-50 text-slate-600 border-slate-100 has-[:checked]:bg-purple-50 has-[:checked]:text-purple-700 has-[:checked]:border-purple-200 has-[:checked]:font-black">
+                  <input type="radio" name="txType" value="exchange" class="hidden"> 台主換幣 (不交接)
+                </label>
+              </div>
+
+              <!-- 備註欄位 -->
+              <div class="space-y-1.5">
+                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">備註說明</label>
+                <div class="bg-slate-50 rounded-2xl px-3 py-2.5 border border-slate-100 flex items-center gap-2">
+                  <i class="fa-regular fa-note-sticky text-slate-400 text-xs"></i>
+                  <input type="text" id="notes" placeholder="選填備註（例如：補滿硬幣、機台保養等）" class="text-xs bg-transparent outline-none w-full text-slate-700 placeholder:text-slate-300 font-bold">
+                </div>
+              </div>
+
+              <!-- 金額輸入區 -->
+              <div class="grid grid-cols-2 gap-3">
+                <div onclick="openCalculator('cashTaken', '拿走鈔票金額')" class="bg-emerald-50/50 hover:bg-emerald-50 border-2 border-emerald-500/20 rounded-2xl p-3.5 cursor-pointer transition shadow-xs">
+                  <div class="text-[11px] text-emerald-700 font-bold flex justify-between items-center">
+                    <span class="truncate">拿走鈔票 ($)</span>
+                    <i class="fa-solid fa-calculator text-emerald-600"></i>
+                  </div>
+                  <div class="text-xl font-black text-emerald-600 mt-1.5 truncate" id="cashTakenDisplay">$ 0</div>
+                  <input type="hidden" id="cashTaken" value="">
+                </div>
+
+                <div onclick="openCalculator('coinsAdded', '補進 10元金額')" class="bg-blue-50/50 hover:bg-blue-50 border-2 border-blue-500/20 rounded-2xl p-3.5 cursor-pointer transition shadow-xs">
+                  <div class="text-[11px] text-blue-700 font-bold flex justify-between items-center">
+                    <span class="truncate">補進 10元 ($)</span>
+                    <i class="fa-solid fa-calculator text-blue-600"></i>
+                  </div>
+                  <div class="text-xl font-black text-blue-600 mt-1.5 truncate" id="coinsAddedDisplay">$ 0</div>
+                  <input type="hidden" id="coinsAdded" value="">
+                </div>
+              </div>
+
+              <!-- 提交按鈕 -->
+              <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-2xl font-black text-sm shadow-lg shadow-indigo-600/25 tap-effect flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-check text-base"></i>
+                儲存今日登記紀錄
+              </button>
+            </form>
+          </div>
         </div>
+
+        <!-- ---- 子頁：紀錄列表 ---- -->
+        <div id="manageHistoryPanel" class="h-full overflow-y-auto no-scrollbar overscroll-contain hidden pb-2">
+          <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 space-y-3">
+            <div class="text-xs font-bold text-slate-400 px-1 flex justify-between items-center">
+              <span>最近抄表紀錄</span>
+              <span class="text-[10px]">柏昇(藍) / 奕昕(粉)</span>
+            </div>
+            <div class="divide-y divide-slate-50" id="historyList">
+              <div class="p-4 text-center text-xs text-slate-400">載入中...</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
 
     <!-- ==================== 分頁二：營收圖表分析頁面 ==================== -->
-    <div id="tabChartContent" class="space-y-4 hidden">
-      
+    <div id="tabChartContent" class="hidden flex-1 min-h-0 flex flex-col gap-3">
+
       <!-- 月份選擇卡片 -->
-      <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex items-center justify-between">
+      <div class="bg-white rounded-3xl p-3.5 shadow-sm border border-slate-100 flex items-center justify-between shrink-0">
         <span class="text-xs font-bold text-slate-500">選擇統計月份</span>
         <input type="month" id="chartMonthSelect" onchange="renderChart()" class="bg-slate-50 text-xs font-black text-indigo-600 border border-slate-200 rounded-xl px-3 py-2 outline-none">
       </div>
 
       <!-- 月份統計摘要 -->
-      <div class="grid grid-cols-3 gap-2.5">
-        <div class="bg-white rounded-3xl p-3.5 shadow-sm border border-slate-100 text-center flex flex-col justify-between">
+      <div class="grid grid-cols-3 gap-2 shrink-0">
+        <div class="bg-white rounded-2xl p-2.5 shadow-sm border border-slate-100 text-center flex flex-col justify-between">
           <div class="text-[10px] text-slate-400 font-bold">總取鈔</div>
-          <div class="text-sm font-black text-emerald-600 my-1 truncate" id="monthTotalCash">$0</div>
+          <div class="text-sm font-black text-emerald-600 my-0.5 truncate" id="monthTotalCash">$0</div>
           <div class="text-[9px] text-slate-400 font-medium">鈔票營收</div>
         </div>
-        <div class="bg-white rounded-3xl p-3.5 shadow-sm border border-slate-100 text-center flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-2.5 shadow-sm border border-slate-100 text-center flex flex-col justify-between">
           <div class="text-[10px] text-slate-400 font-bold">總補幣</div>
-          <div class="text-sm font-black text-blue-600 my-1 truncate" id="monthTotalCoins">$0</div>
+          <div class="text-sm font-black text-blue-600 my-0.5 truncate" id="monthTotalCoins">$0</div>
           <div class="text-[9px] text-slate-400 font-medium">硬幣投入</div>
         </div>
-        <div class="bg-white rounded-3xl p-3.5 shadow-sm border border-slate-100 text-center flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-2.5 shadow-sm border border-slate-100 text-center flex flex-col justify-between">
           <div class="text-[10px] text-slate-400 font-bold">平均補幣</div>
-          <div class="text-sm font-black text-purple-600 my-1 truncate" id="avgRefillDays">-- 天</div>
+          <div class="text-sm font-black text-purple-600 my-0.5 truncate" id="avgRefillDays">-- 天</div>
           <div class="text-[9px] text-slate-400 font-medium">頻率週期</div>
         </div>
       </div>
 
-      <!-- 圖表顯示卡片 -->
-      <div class="bg-white rounded-3xl p-4.5 shadow-sm border border-slate-100 space-y-3">
-        <div class="flex justify-between items-center">
-          <h3 class="text-xs font-bold text-slate-700">每日硬幣消耗量趨勢圖</h3>
-          <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg">消耗幣量 ($)</span>
-        </div>
-        <div class="overflow-x-auto no-scrollbar pt-2 pb-1">
-          <div id="chartBarsContainer" class="flex items-end gap-2.5 min-w-full h-40 px-1 border-b border-slate-100">
-            <div class="w-full text-center text-xs text-slate-400 self-center">載入圖表中...</div>
+      <!-- 子頁籤：月曆總覽 / 每日明細 -->
+      <div class="grid grid-cols-2 gap-1.5 bg-slate-100 rounded-2xl p-1 shrink-0">
+        <button onclick="switchChartSub('calendar')" id="chartSubCalendarBtn" class="py-2 rounded-xl text-xs font-black bg-white text-indigo-600 shadow-sm tap-effect transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-calendar-days text-[11px]"></i>月曆總覽
+        </button>
+        <button onclick="switchChartSub('detail')" id="chartSubDetailBtn" class="py-2 rounded-xl text-xs font-bold text-slate-400 tap-effect transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-list-ul text-[11px]"></i>每日明細
+        </button>
+      </div>
+
+      <!-- 內容區：月曆與明細共用同一塊空間 -->
+      <div class="flex-1 min-h-0 flex flex-col">
+
+        <!-- ---- 子頁：月曆框框圖 ---- -->
+        <div id="chartCalendarPanel" class="h-full overflow-y-auto no-scrollbar overscroll-contain pb-2">
+          <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 space-y-3">
+            <div class="flex justify-between items-center">
+              <h3 class="text-xs font-bold text-slate-700">本月每日消耗總覽</h3>
+              <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg">消耗幣量 ($)</span>
+            </div>
+
+            <!-- 星期標頭 -->
+            <div class="grid grid-cols-7 gap-1.5 text-center">
+              <span class="text-[10px] font-bold text-rose-400">日</span>
+              <span class="text-[10px] font-bold text-slate-400">一</span>
+              <span class="text-[10px] font-bold text-slate-400">二</span>
+              <span class="text-[10px] font-bold text-slate-400">三</span>
+              <span class="text-[10px] font-bold text-slate-400">四</span>
+              <span class="text-[10px] font-bold text-slate-400">五</span>
+              <span class="text-[10px] font-bold text-sky-400">六</span>
+            </div>
+
+            <!-- 每日框框 (1~30/31日) -->
+            <div id="chartCalendarGrid" class="grid grid-cols-7 gap-1.5">
+              <div class="col-span-7 text-center text-xs text-slate-400 py-4">載入圖表中...</div>
+            </div>
+
+            <!-- 圖例 -->
+            <div class="flex items-center justify-center gap-3 pt-1 flex-wrap">
+              <span class="flex items-center gap-1 text-[9px] text-slate-400 font-bold"><i class="w-2.5 h-2.5 rounded-sm bg-slate-50 border border-slate-200 inline-block"></i>無消耗</span>
+              <span class="flex items-center gap-1 text-[9px] text-slate-400 font-bold"><i class="w-2.5 h-2.5 rounded-sm bg-amber-200 inline-block"></i>消耗中</span>
+              <span class="flex items-center gap-1 text-[9px] text-slate-400 font-bold"><i class="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block"></i>消耗高</span>
+              <span class="flex items-center gap-1 text-[9px] text-slate-400 font-bold"><i class="w-2.5 h-2.5 rounded-sm bg-blue-500 inline-block"></i>當日補幣</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 該月每日明細列表 -->
-      <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-50 max-h-52 overflow-y-auto no-scrollbar" id="chartDetailList">
-        <div class="p-4 text-center text-xs text-slate-400">尚無資料</div>
-      </div>
+        <!-- ---- 子頁：每日明細列表 ---- -->
+        <div id="chartDetailPanel" class="h-full overflow-y-auto no-scrollbar overscroll-contain hidden pb-2">
+          <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-50" id="chartDetailList">
+            <div class="p-4 text-center text-xs text-slate-400">尚無資料</div>
+          </div>
+        </div>
 
+      </div>
     </div>
 
   </main>
@@ -398,13 +477,30 @@
     document.getElementById('recordTime').value = now.toTimeString().substring(0, 5);
     document.getElementById('chartMonthSelect').value = todayStr.substring(0, 7);
 
+    // ---- 動態量測標題列／底部導航列高度，讓內容區永遠剛好卡在中間，不留空白也不被蓋住 ----
+    function syncSafeAreas() {
+      const header = document.querySelector('header');
+      const nav = document.querySelector('nav');
+      const main = document.getElementById('mainScroll');
+      if (header && main) {
+        main.style.paddingTop = (header.offsetHeight + 12) + 'px';
+      }
+      if (nav && main) {
+        main.style.paddingBottom = (nav.offsetHeight + 10) + 'px';
+      }
+    }
+    syncSafeAreas();
+    window.addEventListener('load', syncSafeAreas);
+    window.addEventListener('resize', syncSafeAreas);
+    window.addEventListener('orientationchange', syncSafeAreas);
+
+    // ---- 頂層頁籤：管理登記 / 營收圖表 ----
     window.switchTab = function(tabName) {
       const manageContent = document.getElementById('tabManageContent');
       const chartContent = document.getElementById('tabChartContent');
       const navManageBtn = document.getElementById('navManageBtn');
       const navChartBtn = document.getElementById('navChartBtn');
       const headerTitle = document.getElementById('headerTitle');
-      const mainContainer = document.querySelector('main');
 
       if (tabName === 'manage') {
         manageContent.classList.remove('hidden');
@@ -420,7 +516,32 @@
         headerTitle.innerText = "營收圖表分析";
         renderChart();
       }
-      mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // ---- 管理登記內的子頁籤：總覽 / 登記 / 紀錄（點選切換，不需整頁滑動）----
+    const MANAGE_SUB_PANELS = { overview: 'manageOverviewPanel', form: 'manageFormPanel', history: 'manageHistoryPanel' };
+    const MANAGE_SUB_BTNS = { overview: 'manageSubOverviewBtn', form: 'manageSubFormBtn', history: 'manageSubHistoryBtn' };
+    window.switchManageSub = function(name) {
+      Object.keys(MANAGE_SUB_PANELS).forEach(key => {
+        document.getElementById(MANAGE_SUB_PANELS[key]).classList.toggle('hidden', key !== name);
+        const btn = document.getElementById(MANAGE_SUB_BTNS[key]);
+        btn.className = key === name
+          ? "py-2 rounded-xl text-xs font-black bg-white text-indigo-600 shadow-sm tap-effect transition flex items-center justify-center gap-1.5"
+          : "py-2 rounded-xl text-xs font-bold text-slate-400 tap-effect transition flex items-center justify-center gap-1.5";
+      });
+    };
+
+    // ---- 營收圖表內的子頁籤：月曆總覽 / 每日明細 ----
+    const CHART_SUB_PANELS = { calendar: 'chartCalendarPanel', detail: 'chartDetailPanel' };
+    const CHART_SUB_BTNS = { calendar: 'chartSubCalendarBtn', detail: 'chartSubDetailBtn' };
+    window.switchChartSub = function(name) {
+      Object.keys(CHART_SUB_PANELS).forEach(key => {
+        document.getElementById(CHART_SUB_PANELS[key]).classList.toggle('hidden', key !== name);
+        const btn = document.getElementById(CHART_SUB_BTNS[key]);
+        btn.className = key === name
+          ? "py-2 rounded-xl text-xs font-black bg-white text-indigo-600 shadow-sm tap-effect transition flex items-center justify-center gap-1.5"
+          : "py-2 rounded-xl text-xs font-bold text-slate-400 tap-effect transition flex items-center justify-center gap-1.5";
+      });
     };
 
     window.openCalculator = function(fieldId, titleText) {
@@ -586,6 +707,7 @@
         }
 
         renderChart();
+        syncSafeAreas();
 
       } catch (error) {
         console.error("讀取失敗:", error);
@@ -650,38 +772,74 @@
       document.getElementById('monthTotalCoins').innerText = `$${monthTotalCoins.toLocaleString()}`;
       document.getElementById('avgRefillDays').innerText = avgDaysText;
 
-      const container = document.getElementById('chartBarsContainer');
+      const grid = document.getElementById('chartCalendarGrid');
       const detailList = document.getElementById('chartDetailList');
 
+      const [yearStr, monthStr] = selectedMonth.split('-');
+      const daysInMonth = new Date(Number(yearStr), Number(monthStr), 0).getDate();
+      const firstWeekday = new Date(Number(yearStr), Number(monthStr) - 1, 1).getDay(); // 0=日 6=六
+
+      let maxVal = 1000;
+      Object.values(dailyConsumption).forEach(v => {
+        if (v.consumed > maxVal) maxVal = v.consumed;
+      });
+
+      // 判斷框框顏色深淺（依消耗金額比例）
+      function boxColorClass(consumed) {
+        if (consumed <= 0) return 'bg-slate-50 border-slate-100 text-slate-300';
+        const ratio = consumed / maxVal;
+        if (ratio > 0.66) return 'bg-amber-500 border-amber-500 text-white';
+        if (ratio > 0.33) return 'bg-amber-300 border-amber-300 text-amber-900';
+        return 'bg-amber-100 border-amber-100 text-amber-700';
+      }
+
+      let gridHtml = '';
+
+      // 月初前面補空白框，讓日期對齊星期
+      for (let i = 0; i < firstWeekday; i++) {
+        gridHtml += `<div></div>`;
+      }
+
       const chartDates = Object.keys(dailyConsumption).sort();
+      let detailHtml = '';
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dStr = `${yearStr}-${monthStr}-${String(day).padStart(2, '0')}`;
+        const dateObj = new Date(dStr);
+        const inRange = dateObj >= new Date(BASE_DATE) && dateObj <= todayObj;
+        const data = dailyConsumption[dStr];
+
+        if (!inRange || !data) {
+          // 尚未啟用或尚未到達的日期：顯示淡化框框
+          gridHtml += `
+            <div class="aspect-square rounded-xl border border-dashed border-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-200">
+              ${day}
+            </div>
+          `;
+          continue;
+        }
+
+        const colorClass = boxColorClass(data.consumed);
+        const hasRefill = data.coinsAdded > 0;
+
+        gridHtml += `
+          <div class="relative aspect-square rounded-xl border ${colorClass} flex flex-col items-center justify-center gap-0.5 tap-effect ${hasRefill ? 'ring-2 ring-blue-500 ring-offset-1' : ''}">
+            <span class="text-[10px] font-black leading-none">${day}</span>
+            <span class="text-[8px] font-bold leading-none">${data.consumed > 0 ? '$' + (data.consumed >= 1000 ? (data.consumed / 1000).toFixed(1) + 'k' : data.consumed) : '-'}</span>
+            ${hasRefill ? '<span class="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-blue-500 border-2 border-white"></span>' : ''}
+          </div>
+        `;
+      }
+
+      grid.innerHTML = gridHtml;
+
       if (chartDates.length === 0) {
-        container.innerHTML = '<div class="w-full text-center text-xs text-slate-400 self-center">該月份尚無資料</div>';
         detailList.innerHTML = '<div class="p-4 text-center text-xs text-slate-400">尚無明細資料</div>';
         return;
       }
 
-      let maxVal = 1000;
-      chartDates.forEach(d => {
-        if (dailyConsumption[d].consumed > maxVal) maxVal = dailyConsumption[d].consumed;
-      });
-
-      let barsHtml = '';
-      let detailHtml = '';
-
       chartDates.forEach(d => {
         const data = dailyConsumption[d];
-        const height = Math.round((data.consumed / maxVal) * 110);
-        const dayLabel = d.substring(8); 
-
-        barsHtml += `
-          <div class="flex flex-col items-center h-full justify-end flex-1 min-w-[28px] group">
-            <div class="flex items-end justify-center h-[110px]">
-              <div class="w-3.5 bg-amber-500 rounded-t-lg transition-all duration-300" style="height: ${height}px;" title="消耗: $${data.consumed}"></div>
-            </div>
-            <div class="text-[9px] text-slate-400 font-bold mt-1.5">${dayLabel}日</div>
-          </div>
-        `;
-
         detailHtml += `
           <div class="p-3.5 flex items-center justify-between">
             <div>
@@ -695,12 +853,12 @@
         `;
       });
 
-      container.innerHTML = barsHtml;
       detailList.innerHTML = detailHtml;
     };
 
     window.editRecord = function(id) {
-      switchTab('manage'); 
+      switchTab('manage');
+      switchManageSub('form');
       const data = window.allRecordsData[id];
       if (!data) return;
 
@@ -735,7 +893,7 @@
       document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-pen"></i> 確認修改儲存';
       document.getElementById('submitBtn').classList.replace('bg-indigo-600', 'bg-emerald-600');
 
-      document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('manageFormPanel').scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.cancelEdit = function() {
