@@ -88,11 +88,11 @@
         </button>
       </div>
 
-      <!-- 內容區：三個子頁面共用同一塊空間，切換時不跳動、不需整頁滑動 -->
-      <div class="flex-1 min-h-0 flex flex-col">
+      <!-- 內容區：三個子頁面共用同一塊空間，切換時不跳動、不需整頁滑動；可左右滑動換頁 -->
+      <div id="manageSwipeArea" class="flex-1 min-h-0 flex flex-col">
 
         <!-- ---- 子頁：總覽 ---- -->
-        <div id="manageOverviewPanel" class="h-full overflow-y-auto no-scrollbar overscroll-contain space-y-3 pb-2">
+        <div id="manageOverviewPanel" class="h-full overflow-y-auto no-scrollbar overscroll-contain flex flex-col justify-center gap-5 pb-2">
 
           <!-- 幣量低於 10,000 警告橫幅 -->
           <div id="coinWarningAlert" class="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 flex items-center gap-3 hidden animate-pulse shadow-sm">
@@ -105,60 +105,60 @@
             </div>
           </div>
 
-          <!-- 儀表板卡片 -->
-          <div class="grid grid-cols-2 gap-3">
+          <!-- 儀表板卡片（放大呈現，填滿可用畫面） -->
+          <div class="grid grid-cols-2 gap-4">
             <!-- 剩餘 10 元硬幣 -->
-            <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden">
-              <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none"></div>
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs shrink-0">
+            <div class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden min-h-[168px]">
+              <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none"></div>
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm shrink-0">
                   <i class="fa-solid fa-coins"></i>
                 </div>
-                <span class="text-xs font-bold text-slate-400 truncate">剩餘硬幣</span>
+                <span class="text-sm font-bold text-slate-400 truncate">剩餘硬幣</span>
               </div>
-              <div class="my-2">
-                <div class="text-2xl font-black text-slate-900 tracking-tight truncate" id="currentCoins">$ 25,000</div>
-                <div class="text-[11px] text-slate-400 font-bold mt-0.5 truncate" id="coinCount">約 2,500 枚</div>
+              <div class="my-3">
+                <div class="text-4xl font-black text-slate-900 tracking-tight truncate" id="currentCoins">$ 25,000</div>
+                <div class="text-xs text-slate-400 font-bold mt-1 truncate" id="coinCount">約 2,500 枚</div>
               </div>
-              <span class="text-[10px] text-blue-600 bg-blue-50/80 py-1 px-2 rounded-lg inline-block self-start font-extrabold">初始 $25,000 (9/4)</span>
+              <span class="text-xs text-blue-600 bg-blue-50/80 py-1.5 px-3 rounded-xl inline-block self-start font-extrabold">初始 $25,000 (9/4)</span>
             </div>
 
             <!-- 累計取走鈔票 -->
-            <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden">
-              <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none"></div>
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs shrink-0">
+            <div class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden min-h-[168px]">
+              <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none"></div>
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm shrink-0">
                   <i class="fa-solid fa-money-bill-wave"></i>
                 </div>
-                <span class="text-xs font-bold text-slate-400 truncate">歷史總營收</span>
+                <span class="text-sm font-bold text-slate-400 truncate">歷史總營收</span>
               </div>
-              <div class="my-2">
-                <div class="text-2xl font-black text-emerald-600 tracking-tight truncate" id="totalCashTaken">$ 0</div>
-                <div class="text-[11px] text-slate-400 font-bold mt-0.5 truncate" id="totalCoinsAdded">補幣累計: $0</div>
+              <div class="my-3">
+                <div class="text-4xl font-black text-emerald-600 tracking-tight truncate" id="totalCashTaken">$ 0</div>
+                <div class="text-xs text-slate-400 font-bold mt-1 truncate" id="totalCoinsAdded">補幣累計: $0</div>
               </div>
-              <span class="text-[10px] text-emerald-700 bg-emerald-50/80 py-1 px-2 rounded-lg inline-block self-start font-extrabold">已取走鈔票</span>
+              <span class="text-xs text-emerald-700 bg-emerald-50/80 py-1.5 px-3 rounded-xl inline-block self-start font-extrabold">已取走鈔票</span>
             </div>
           </div>
 
           <!-- 柏昇交接給奕昕的欠款狀態卡片 -->
-          <div id="debtCard" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-3xl p-4 flex items-center justify-between shadow-md shadow-amber-500/20 hidden">
-            <div class="flex items-center gap-3 min-w-0 pr-2">
-              <div class="w-10 h-10 rounded-2xl bg-white/20 ios-blur flex items-center justify-center text-base font-bold shrink-0">
+          <div id="debtCard" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-[28px] p-5 flex items-center justify-between shadow-md shadow-amber-500/20 hidden">
+            <div class="flex items-center gap-3.5 min-w-0 pr-2">
+              <div class="w-12 h-12 rounded-2xl bg-white/20 ios-blur flex items-center justify-center text-lg font-bold shrink-0">
                 <i class="fa-solid fa-hand-holding-dollar"></i>
               </div>
               <div class="min-w-0">
-                <div class="text-xs font-medium text-amber-100 truncate">柏昇未交接現金（待收回）</div>
-                <div class="text-xl font-black tracking-tight truncate" id="pendingDebtAmount">$ 0</div>
+                <div class="text-sm font-medium text-amber-100 truncate">柏昇未交接現金（待收回）</div>
+                <div class="text-2xl font-black tracking-tight truncate" id="pendingDebtAmount">$ 0</div>
               </div>
             </div>
-            <button onclick="openSettleModal()" class="bg-white text-amber-900 text-xs font-black px-3.5 py-2.5 rounded-2xl tap-effect shadow-sm shrink-0">
+            <button onclick="openSettleModal()" class="bg-white text-amber-900 text-sm font-black px-4 py-3 rounded-2xl tap-effect shadow-sm shrink-0">
               奕昕收回
             </button>
           </div>
 
           <!-- 快速前往登記 -->
-          <button onclick="switchManageSub('form')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-2xl font-black text-sm shadow-lg shadow-indigo-600/25 tap-effect flex items-center justify-center gap-2">
-            <i class="fa-solid fa-plus text-base"></i>
+          <button onclick="switchManageSub('form')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4.5 rounded-2xl font-black text-base shadow-lg shadow-indigo-600/25 tap-effect flex items-center justify-center gap-2">
+            <i class="fa-solid fa-plus text-lg"></i>
             新增今日登記
           </button>
         </div>
@@ -306,8 +306,8 @@
         </button>
       </div>
 
-      <!-- 內容區：月曆與明細共用同一塊空間 -->
-      <div class="flex-1 min-h-0 flex flex-col">
+      <!-- 內容區：月曆與明細共用同一塊空間，可左右滑動換頁 -->
+      <div id="chartSwipeArea" class="flex-1 min-h-0 flex flex-col">
 
         <!-- ---- 子頁：月曆框框圖 ---- -->
         <div id="chartCalendarPanel" class="h-full overflow-y-auto no-scrollbar overscroll-contain pb-2">
@@ -519,9 +519,12 @@
     };
 
     // ---- 管理登記內的子頁籤：總覽 / 登記 / 紀錄（點選切換，不需整頁滑動）----
+    const MANAGE_SUB_ORDER = ['overview', 'form', 'history'];
     const MANAGE_SUB_PANELS = { overview: 'manageOverviewPanel', form: 'manageFormPanel', history: 'manageHistoryPanel' };
     const MANAGE_SUB_BTNS = { overview: 'manageSubOverviewBtn', form: 'manageSubFormBtn', history: 'manageSubHistoryBtn' };
+    let currentManageSub = 'overview';
     window.switchManageSub = function(name) {
+      currentManageSub = name;
       Object.keys(MANAGE_SUB_PANELS).forEach(key => {
         document.getElementById(MANAGE_SUB_PANELS[key]).classList.toggle('hidden', key !== name);
         const btn = document.getElementById(MANAGE_SUB_BTNS[key]);
@@ -532,9 +535,12 @@
     };
 
     // ---- 營收圖表內的子頁籤：月曆總覽 / 每日明細 ----
+    const CHART_SUB_ORDER = ['calendar', 'detail'];
     const CHART_SUB_PANELS = { calendar: 'chartCalendarPanel', detail: 'chartDetailPanel' };
     const CHART_SUB_BTNS = { calendar: 'chartSubCalendarBtn', detail: 'chartSubDetailBtn' };
+    let currentChartSub = 'calendar';
     window.switchChartSub = function(name) {
+      currentChartSub = name;
       Object.keys(CHART_SUB_PANELS).forEach(key => {
         document.getElementById(CHART_SUB_PANELS[key]).classList.toggle('hidden', key !== name);
         const btn = document.getElementById(CHART_SUB_BTNS[key]);
@@ -543,6 +549,39 @@
           : "py-2 rounded-xl text-xs font-bold text-slate-400 tap-effect transition flex items-center justify-center gap-1.5";
       });
     };
+
+    // ---- 左右滑動換頁（子頁籤區域用手勢滑動即可切換，不用一定要點按鈕）----
+    function enableSwipeTabs(wrapperId, order, switchFn, getCurrent) {
+      const el = document.getElementById(wrapperId);
+      if (!el) return;
+      let startX = 0, startY = 0, tracking = false;
+
+      el.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        tracking = true;
+      }, { passive: true });
+
+      el.addEventListener('touchend', (e) => {
+        if (!tracking) return;
+        tracking = false;
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        // 需要明顯的水平滑動，且不能是垂直捲動誤觸
+        if (Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+
+        const idx = order.indexOf(getCurrent());
+        if (idx === -1) return;
+        // 向左滑 -> 下一頁；向右滑 -> 上一頁
+        let nextIdx = dx < 0 ? idx + 1 : idx - 1;
+        nextIdx = Math.max(0, Math.min(order.length - 1, nextIdx));
+        if (nextIdx !== idx) switchFn(order[nextIdx]);
+      }, { passive: true });
+    }
+
+    enableSwipeTabs('manageSwipeArea', MANAGE_SUB_ORDER, window.switchManageSub, () => currentManageSub);
+    enableSwipeTabs('chartSwipeArea', CHART_SUB_ORDER, window.switchChartSub, () => currentChartSub);
 
     window.openCalculator = function(fieldId, titleText) {
       currentCalcField = fieldId;
