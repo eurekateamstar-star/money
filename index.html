@@ -9,6 +9,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome 圖示庫 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- 可愛圓體字型 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
   <style>
     /* 鎖定網頁整體根部，防止整個畫面亂飄或左右晃動 */
     html, body {
@@ -18,7 +21,7 @@
       height: 100dvh; /* 修正手機瀏覽器網址列縮放造成的高度跳動 */
       position: fixed;
       inset: 0;
-      background-color: #F8FAFC;
+      background: linear-gradient(180deg, #FFF3F8 0%, #F5F3FF 100%);
       overscroll-behavior: none; /* 防止 iOS/Android 整頁橡皮筋回彈 */
     }
     body {
@@ -28,6 +31,11 @@
       flex-direction: column;
       justify-content: space-between;
       touch-action: none; /* 禁止整個頁面被手勢拖動，避免標題跟著位移出現空白 */
+    }
+    /* 可愛圓體字，用在標題與大數字上 */
+    .font-cute {
+      font-family: 'ZCOOL KuaiLe', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-weight: 400;
     }
     /* 只有主內容區可以垂直滾動，其餘區域（含標題列）完全不動 */
     main {
@@ -55,15 +63,15 @@
 <body class="text-slate-800 select-none">
 
   <!-- 頂部精簡導航列 (真正固定於畫面頂部，不隨內容滾動) -->
-  <header class="fixed top-0 left-0 right-0 z-40 bg-white/90 ios-blur border-b border-slate-100 pt-safe shadow-xs w-full">
+  <header class="fixed top-0 left-0 right-0 z-40 bg-white/90 ios-blur border-b border-pink-100 pt-safe shadow-xs w-full">
     <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs shadow-md shadow-indigo-500/20 shrink-0">
-          <i class="fa-solid fa-gamepad"></i>
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-400 text-white flex items-center justify-center text-xs shadow-md shadow-pink-400/30 shrink-0">
+          🎮
         </div>
-        <h1 class="text-base font-black text-slate-900 tracking-tight truncate" id="headerTitle">兌幣機管理系統</h1>
+        <h1 class="font-cute text-lg text-pink-500 tracking-tight truncate" id="headerTitle">兌幣機管理系統</h1>
       </div>
-      <button onclick="fetchData()" class="w-8 h-8 rounded-full bg-slate-100 text-indigo-600 flex items-center justify-center tap-effect text-xs shadow-xs shrink-0">
+      <button onclick="fetchData()" class="w-8 h-8 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center tap-effect text-xs shadow-xs shrink-0">
         <i class="fa-solid fa-arrows-rotate"></i>
       </button>
     </div>
@@ -77,7 +85,7 @@
 
       <!-- 子頁籤：總覽 / 登記 / 紀錄 -->
       <div class="grid grid-cols-3 gap-1.5 bg-slate-100 rounded-2xl p-1 shrink-0">
-        <button onclick="switchManageSub('overview')" id="manageSubOverviewBtn" class="py-2 rounded-xl text-xs font-black bg-white text-indigo-600 shadow-sm tap-effect transition flex items-center justify-center gap-1.5">
+        <button onclick="switchManageSub('overview')" id="manageSubOverviewBtn" class="py-2 rounded-xl text-xs font-black bg-white text-pink-500 shadow-sm tap-effect transition flex items-center justify-center gap-1.5">
           <i class="fa-solid fa-gauge-high text-[11px]"></i>總覽
         </button>
         <button onclick="switchManageSub('form')" id="manageSubFormBtn" class="py-2 rounded-xl text-xs font-bold text-slate-400 tap-effect transition flex items-center justify-center gap-1.5">
@@ -105,60 +113,60 @@
             </div>
           </div>
 
-          <!-- 儀表板卡片（放大呈現，填滿可用畫面） -->
-          <div class="grid grid-cols-2 gap-4">
+          <!-- 儀表板卡片（可愛馬卡龍配色） -->
+          <div class="grid grid-cols-2 gap-3">
             <!-- 剩餘 10 元硬幣 -->
-            <div class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden min-h-[168px]">
-              <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none"></div>
-              <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm shrink-0">
+            <div class="bg-gradient-to-br from-sky-50 to-blue-100 rounded-3xl p-4 shadow-sm border border-white flex flex-col justify-between relative overflow-hidden">
+              <div class="absolute -top-3 -right-3 text-3xl opacity-40 select-none pointer-events-none">🪙</div>
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full bg-white/80 text-sky-500 flex items-center justify-center text-xs shrink-0 shadow-sm">
                   <i class="fa-solid fa-coins"></i>
                 </div>
-                <span class="text-sm font-bold text-slate-400 truncate">剩餘硬幣</span>
+                <span class="text-xs font-bold text-sky-700/70 truncate">剩餘硬幣</span>
               </div>
-              <div class="my-3">
-                <div class="text-4xl font-black text-slate-900 tracking-tight truncate" id="currentCoins">$ 25,000</div>
-                <div class="text-xs text-slate-400 font-bold mt-1 truncate" id="coinCount">約 2,500 枚</div>
+              <div class="my-2">
+                <div class="font-cute text-2xl text-sky-700 tracking-tight truncate" id="currentCoins">$ 25,000</div>
+                <div class="text-[11px] text-sky-600/70 font-bold mt-0.5 truncate" id="coinCount">約 2,500 枚</div>
               </div>
-              <span class="text-xs text-blue-600 bg-blue-50/80 py-1.5 px-3 rounded-xl inline-block self-start font-extrabold">初始 $25,000 (9/4)</span>
+              <span class="text-[10px] text-white bg-sky-400 py-1 px-2 rounded-full inline-block self-start font-extrabold shadow-sm">初始 $25,000 (9/4)</span>
             </div>
 
             <!-- 累計取走鈔票 -->
-            <div class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden min-h-[168px]">
-              <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none"></div>
-              <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm shrink-0">
+            <div class="bg-gradient-to-br from-emerald-50 to-teal-100 rounded-3xl p-4 shadow-sm border border-white flex flex-col justify-between relative overflow-hidden">
+              <div class="absolute -top-3 -right-3 text-3xl opacity-40 select-none pointer-events-none">💰</div>
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full bg-white/80 text-emerald-500 flex items-center justify-center text-xs shrink-0 shadow-sm">
                   <i class="fa-solid fa-money-bill-wave"></i>
                 </div>
-                <span class="text-sm font-bold text-slate-400 truncate">歷史總營收</span>
+                <span class="text-xs font-bold text-emerald-700/70 truncate">歷史總營收</span>
               </div>
-              <div class="my-3">
-                <div class="text-4xl font-black text-emerald-600 tracking-tight truncate" id="totalCashTaken">$ 0</div>
-                <div class="text-xs text-slate-400 font-bold mt-1 truncate" id="totalCoinsAdded">補幣累計: $0</div>
+              <div class="my-2">
+                <div class="font-cute text-2xl text-emerald-700 tracking-tight truncate" id="totalCashTaken">$ 0</div>
+                <div class="text-[11px] text-emerald-600/70 font-bold mt-0.5 truncate" id="totalCoinsAdded">補幣累計: $0</div>
               </div>
-              <span class="text-xs text-emerald-700 bg-emerald-50/80 py-1.5 px-3 rounded-xl inline-block self-start font-extrabold">已取走鈔票</span>
+              <span class="text-[10px] text-white bg-emerald-400 py-1 px-2 rounded-full inline-block self-start font-extrabold shadow-sm">已取走鈔票</span>
             </div>
           </div>
 
           <!-- 柏昇交接給奕昕的欠款狀態卡片 -->
-          <div id="debtCard" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-[28px] p-5 flex items-center justify-between shadow-md shadow-amber-500/20 hidden">
-            <div class="flex items-center gap-3.5 min-w-0 pr-2">
-              <div class="w-12 h-12 rounded-2xl bg-white/20 ios-blur flex items-center justify-center text-lg font-bold shrink-0">
-                <i class="fa-solid fa-hand-holding-dollar"></i>
+          <div id="debtCard" class="bg-gradient-to-r from-orange-300 to-pink-300 text-white rounded-3xl p-4 flex items-center justify-between shadow-md shadow-orange-300/30 hidden">
+            <div class="flex items-center gap-3 min-w-0 pr-2">
+              <div class="w-10 h-10 rounded-2xl bg-white/25 ios-blur flex items-center justify-center text-base shrink-0">
+                🐷
               </div>
               <div class="min-w-0">
-                <div class="text-sm font-medium text-amber-100 truncate">柏昇未交接現金（待收回）</div>
-                <div class="text-2xl font-black tracking-tight truncate" id="pendingDebtAmount">$ 0</div>
+                <div class="text-xs font-medium text-orange-50 truncate">柏昇未交接現金（待收回）</div>
+                <div class="font-cute text-xl tracking-tight truncate" id="pendingDebtAmount">$ 0</div>
               </div>
             </div>
-            <button onclick="openSettleModal()" class="bg-white text-amber-900 text-sm font-black px-4 py-3 rounded-2xl tap-effect shadow-sm shrink-0">
+            <button onclick="openSettleModal()" class="bg-white text-orange-500 text-xs font-black px-3.5 py-2.5 rounded-full tap-effect shadow-sm shrink-0">
               奕昕收回
             </button>
           </div>
 
           <!-- 快速前往登記 -->
-          <button onclick="switchManageSub('form')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4.5 rounded-2xl font-black text-base shadow-lg shadow-indigo-600/25 tap-effect flex items-center justify-center gap-2">
-            <i class="fa-solid fa-plus text-lg"></i>
+          <button onclick="switchManageSub('form')" class="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-3.5 rounded-full font-cute text-base shadow-lg shadow-pink-400/30 tap-effect flex items-center justify-center gap-2">
+            <i class="fa-solid fa-plus text-base"></i>
             新增今日登記
           </button>
         </div>
@@ -170,13 +178,13 @@
             <!-- 標題與日期時間排在同一行 -->
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 gap-2">
               <div class="text-sm font-black text-slate-800 flex items-center gap-2 shrink-0">
-                <i class="fa-solid fa-pen-to-square text-indigo-600"></i>
+                <i class="fa-solid fa-pen-to-square text-pink-500"></i>
                 <span id="formTitle">機台巡檢與收支登記</span>
               </div>
 
               <!-- 右側日期與時間整合選單 -->
               <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-xl px-2 py-1">
-                <input type="date" id="recordDate" class="text-[11px] bg-transparent outline-none text-indigo-600 font-extrabold w-22">
+                <input type="date" id="recordDate" class="text-[11px] bg-transparent outline-none text-pink-500 font-extrabold w-22">
                 <span class="text-slate-300">|</span>
                 <input type="time" id="recordTime" class="text-[11px] bg-transparent outline-none text-slate-700 font-extrabold w-13">
               </div>
@@ -191,11 +199,11 @@
               <div class="space-y-1.5">
                 <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">處理人員</label>
                 <div class="grid grid-cols-2 gap-2.5">
-                  <label class="cursor-pointer text-center text-xs font-black py-3 rounded-2xl border-2 transition select-none flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-100 has-[:checked]:bg-sky-500 has-[:checked]:text-white has-[:checked]:border-sky-500 has-[:checked]:shadow-md has-[:checked]:shadow-sky-500/25">
+                  <label class="cursor-pointer text-center text-xs font-black py-3 rounded-2xl border-2 transition select-none flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-100 has-[:checked]:bg-sky-400 has-[:checked]:text-white has-[:checked]:border-sky-400 has-[:checked]:shadow-md has-[:checked]:shadow-sky-400/30">
                     <input type="radio" name="operator" value="柏昇" class="hidden" checked> 
                     <i class="fa-solid fa-user-astronaut text-sm"></i> 柏昇
                   </label>
-                  <label class="cursor-pointer text-center text-xs font-black py-3 rounded-2xl border-2 transition select-none flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-100 has-[:checked]:bg-fuchsia-600 has-[:checked]:text-white has-[:checked]:border-fuchsia-600 has-[:checked]:shadow-md has-[:checked]:shadow-fuchsia-600/25">
+                  <label class="cursor-pointer text-center text-xs font-black py-3 rounded-2xl border-2 transition select-none flex items-center justify-center gap-2 bg-slate-50 text-slate-500 border-slate-100 has-[:checked]:bg-rose-400 has-[:checked]:text-white has-[:checked]:border-rose-400 has-[:checked]:shadow-md has-[:checked]:shadow-rose-400/30">
                     <input type="radio" name="operator" value="奕昕" class="hidden"> 
                     <i class="fa-solid fa-user-ninja text-sm"></i> 奕昕
                   </label>
@@ -204,7 +212,7 @@
 
               <!-- 交易性質 -->
               <div class="grid grid-cols-2 gap-2.5">
-                <label class="cursor-pointer text-center text-xs font-bold py-2.5 rounded-2xl border-2 transition select-none bg-slate-50 text-slate-600 border-slate-100 has-[:checked]:bg-indigo-50 has-[:checked]:text-indigo-700 has-[:checked]:border-indigo-200 has-[:checked]:font-black">
+                <label class="cursor-pointer text-center text-xs font-bold py-2.5 rounded-2xl border-2 transition select-none bg-slate-50 text-slate-600 border-slate-100 has-[:checked]:bg-pink-50 has-[:checked]:text-pink-600 has-[:checked]:border-pink-200 has-[:checked]:font-black">
                   <input type="radio" name="txType" value="normal" class="hidden" checked> 一般交接 (需收回)
                 </label>
                 <label class="cursor-pointer text-center text-xs font-bold py-2.5 rounded-2xl border-2 transition select-none bg-slate-50 text-slate-600 border-slate-100 has-[:checked]:bg-purple-50 has-[:checked]:text-purple-700 has-[:checked]:border-purple-200 has-[:checked]:font-black">
@@ -243,7 +251,7 @@
               </div>
 
               <!-- 提交按鈕 -->
-              <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-2xl font-black text-sm shadow-lg shadow-indigo-600/25 tap-effect flex items-center justify-center gap-2">
+              <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white py-3.5 rounded-full font-cute text-base shadow-lg shadow-pink-400/30 tap-effect flex items-center justify-center gap-2">
                 <i class="fa-solid fa-circle-check text-base"></i>
                 儲存今日登記紀錄
               </button>
@@ -274,7 +282,7 @@
       <!-- 月份選擇卡片 -->
       <div class="bg-white rounded-3xl p-3.5 shadow-sm border border-slate-100 flex items-center justify-between shrink-0">
         <span class="text-xs font-bold text-slate-500">選擇統計月份</span>
-        <input type="month" id="chartMonthSelect" onchange="renderChart()" class="bg-slate-50 text-xs font-black text-indigo-600 border border-slate-200 rounded-xl px-3 py-2 outline-none">
+        <input type="month" id="chartMonthSelect" onchange="renderChart()" class="bg-slate-50 text-xs font-black text-pink-500 border border-slate-200 rounded-xl px-3 py-2 outline-none">
       </div>
 
       <!-- 月份統計摘要 -->
@@ -298,7 +306,7 @@
 
       <!-- 子頁籤：月曆總覽 / 每日明細 -->
       <div class="grid grid-cols-2 gap-1.5 bg-slate-100 rounded-2xl p-1 shrink-0">
-        <button onclick="switchChartSub('calendar')" id="chartSubCalendarBtn" class="py-2 rounded-xl text-xs font-black bg-white text-indigo-600 shadow-sm tap-effect transition flex items-center justify-center gap-1.5">
+        <button onclick="switchChartSub('calendar')" id="chartSubCalendarBtn" class="py-2 rounded-xl text-xs font-black bg-white text-pink-500 shadow-sm tap-effect transition flex items-center justify-center gap-1.5">
           <i class="fa-solid fa-calendar-days text-[11px]"></i>月曆總覽
         </button>
         <button onclick="switchChartSub('detail')" id="chartSubDetailBtn" class="py-2 rounded-xl text-xs font-bold text-slate-400 tap-effect transition flex items-center justify-center gap-1.5">
@@ -359,7 +367,7 @@
   <!-- ==================== 底部固定導航列 (Tab Bar) ==================== -->
   <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 ios-blur border-t border-slate-100 pb-safe shadow-lg shrink-0">
     <div class="max-w-md mx-auto grid grid-cols-2 py-2 px-6">
-      <button onclick="switchTab('manage')" id="navManageBtn" class="flex flex-col items-center gap-1 text-indigo-600 font-black tap-effect">
+      <button onclick="switchTab('manage')" id="navManageBtn" class="flex flex-col items-center gap-1 text-pink-500 font-black tap-effect">
         <i class="fa-solid fa-cash-register text-lg"></i>
         <span class="text-[11px]">管理登記</span>
       </button>
@@ -387,10 +395,10 @@
       </div>
 
       <div class="grid grid-cols-4 gap-2">
-        <button type="button" onclick="calcQuickAdd(100)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold py-2.5 rounded-xl tap-effect">+100</button>
-        <button type="button" onclick="calcQuickAdd(500)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold py-2.5 rounded-xl tap-effect">+500</button>
-        <button type="button" onclick="calcQuickAdd(1000)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold py-2.5 rounded-xl tap-effect">+1,000</button>
-        <button type="button" onclick="calcQuickAdd(5000)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold py-2.5 rounded-xl tap-effect">+5,000</button>
+        <button type="button" onclick="calcQuickAdd(100)" class="bg-pink-50 text-pink-500 hover:bg-pink-100 text-xs font-bold py-2.5 rounded-xl tap-effect">+100</button>
+        <button type="button" onclick="calcQuickAdd(500)" class="bg-pink-50 text-pink-500 hover:bg-pink-100 text-xs font-bold py-2.5 rounded-xl tap-effect">+500</button>
+        <button type="button" onclick="calcQuickAdd(1000)" class="bg-pink-50 text-pink-500 hover:bg-pink-100 text-xs font-bold py-2.5 rounded-xl tap-effect">+1,000</button>
+        <button type="button" onclick="calcQuickAdd(5000)" class="bg-pink-50 text-pink-500 hover:bg-pink-100 text-xs font-bold py-2.5 rounded-xl tap-effect">+5,000</button>
       </div>
 
       <div class="grid grid-cols-3 gap-2 text-base font-bold text-slate-700">
@@ -408,7 +416,7 @@
         <button type="button" onclick="calcBackspace()" class="bg-slate-100 hover:bg-slate-200 py-3.5 rounded-2xl tap-effect text-sm"><i class="fa-solid fa-delete-left"></i></button>
       </div>
 
-      <button type="button" onclick="confirmCalculator()" class="w-full bg-indigo-600 text-white py-3.5 rounded-2xl font-black text-sm shadow-md shadow-indigo-600/30 tap-effect">
+      <button type="button" onclick="confirmCalculator()" class="w-full bg-gradient-to-r from-pink-400 to-rose-400 text-white py-3.5 rounded-full font-cute text-base shadow-md shadow-pink-400/30 tap-effect">
         確認套用金額
       </button>
 
@@ -425,7 +433,7 @@
       <div class="space-y-3">
         <div>
           <label class="text-xs font-bold text-slate-600 block mb-1">回收日期</label>
-          <input type="date" id="settleDate" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 outline-none text-indigo-600 font-bold">
+          <input type="date" id="settleDate" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 outline-none text-pink-500 font-bold">
         </div>
         <div>
           <label class="text-xs font-bold text-slate-600 block mb-1">回收時間</label>
@@ -505,13 +513,13 @@
       if (tabName === 'manage') {
         manageContent.classList.remove('hidden');
         chartContent.classList.add('hidden');
-        navManageBtn.className = "flex flex-col items-center gap-1 text-indigo-600 font-black tap-effect";
+        navManageBtn.className = "flex flex-col items-center gap-1 text-pink-500 font-black tap-effect";
         navChartBtn.className = "flex flex-col items-center gap-1 text-slate-400 font-semibold tap-effect";
         headerTitle.innerText = "兌幣機管理系統";
       } else {
         manageContent.classList.add('hidden');
         chartContent.classList.remove('hidden');
-        navChartBtn.className = "flex flex-col items-center gap-1 text-indigo-600 font-black tap-effect";
+        navChartBtn.className = "flex flex-col items-center gap-1 text-pink-500 font-black tap-effect";
         navManageBtn.className = "flex flex-col items-center gap-1 text-slate-400 font-semibold tap-effect";
         headerTitle.innerText = "營收圖表分析";
         renderChart();
@@ -529,7 +537,7 @@
         document.getElementById(MANAGE_SUB_PANELS[key]).classList.toggle('hidden', key !== name);
         const btn = document.getElementById(MANAGE_SUB_BTNS[key]);
         btn.className = key === name
-          ? "py-2 rounded-xl text-xs font-black bg-white text-indigo-600 shadow-sm tap-effect transition flex items-center justify-center gap-1.5"
+          ? "py-2 rounded-xl text-xs font-black bg-white text-pink-500 shadow-sm tap-effect transition flex items-center justify-center gap-1.5"
           : "py-2 rounded-xl text-xs font-bold text-slate-400 tap-effect transition flex items-center justify-center gap-1.5";
       });
     };
@@ -545,7 +553,7 @@
         document.getElementById(CHART_SUB_PANELS[key]).classList.toggle('hidden', key !== name);
         const btn = document.getElementById(CHART_SUB_BTNS[key]);
         btn.className = key === name
-          ? "py-2 rounded-xl text-xs font-black bg-white text-indigo-600 shadow-sm tap-effect transition flex items-center justify-center gap-1.5"
+          ? "py-2 rounded-xl text-xs font-black bg-white text-pink-500 shadow-sm tap-effect transition flex items-center justify-center gap-1.5"
           : "py-2 rounded-xl text-xs font-bold text-slate-400 tap-effect transition flex items-center justify-center gap-1.5";
       });
     };
@@ -686,8 +694,8 @@
             }
 
             let operatorBadge = operator === '柏昇' 
-              ? `<span class="text-[10px] text-white bg-sky-500 px-2 py-0.5 rounded-lg font-black shadow-xs">柏昇</span>`
-              : `<span class="text-[10px] text-white bg-fuchsia-600 px-2 py-0.5 rounded-lg font-black shadow-xs">奕昕</span>`;
+              ? `<span class="text-[10px] text-white bg-sky-400 px-2 py-0.5 rounded-full font-black shadow-xs">柏昇</span>`
+              : `<span class="text-[10px] text-white bg-rose-400 px-2 py-0.5 rounded-full font-black shadow-xs">奕昕</span>`;
 
             let statusBadge = '';
             if (txType === 'exchange') {
@@ -696,7 +704,7 @@
               if (isSettled) {
                 statusBadge = `<span class="text-[9px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-bold">已收回</span>`;
               } else {
-                statusBadge = `<span class="text-[9px] text-amber-900 bg-amber-100 px-2 py-0.5 rounded-md font-black animate-pulse">待收回</span>`;
+                statusBadge = `<span class="text-[9px] text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full font-black animate-pulse">待收回</span>`;
               }
             }
 
@@ -714,7 +722,7 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
-                  <button onclick="editRecord('${id}')" class="text-slate-300 hover:text-indigo-600 p-2 text-xs tap-effect"><i class="fa-regular fa-pen-to-square text-sm"></i></button>
+                  <button onclick="editRecord('${id}')" class="text-slate-300 hover:text-pink-500 p-2 text-xs tap-effect"><i class="fa-regular fa-pen-to-square text-sm"></i></button>
                   <button onclick="deleteRecord('${id}')" class="text-slate-300 hover:text-rose-500 p-2 text-xs tap-effect"><i class="fa-regular fa-trash-can text-sm"></i></button>
                 </div>
               </div>
@@ -930,7 +938,8 @@
       document.getElementById('formTitle').innerText = '編輯紀錄';
       document.getElementById('cancelEditBtn').classList.remove('hidden');
       document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-pen"></i> 確認修改儲存';
-      document.getElementById('submitBtn').classList.replace('bg-indigo-600', 'bg-emerald-600');
+      document.getElementById('submitBtn').classList.remove('from-pink-400', 'to-rose-400', 'hover:from-pink-500', 'hover:to-rose-500');
+      document.getElementById('submitBtn').classList.add('bg-emerald-500', 'hover:bg-emerald-600');
 
       document.getElementById('manageFormPanel').scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -940,7 +949,8 @@
       document.getElementById('formTitle').innerText = '機台巡檢與收支登記';
       document.getElementById('cancelEditBtn').classList.add('hidden');
       document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-circle-check text-base"></i> 儲存今日登記紀錄';
-      document.getElementById('submitBtn').classList.replace('bg-emerald-600', 'bg-indigo-600');
+      document.getElementById('submitBtn').classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
+      document.getElementById('submitBtn').classList.add('from-pink-400', 'to-rose-400', 'hover:from-pink-500', 'hover:to-rose-500');
 
       document.getElementById('recordForm').reset();
       document.getElementById('cashTaken').value = "";
